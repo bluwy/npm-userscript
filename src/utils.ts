@@ -49,19 +49,16 @@ export function listenNavigate(listener: () => void) {
     const _replaceState = history.replaceState
 
     history.pushState = function (...args) {
-      console.log('pushState', args)
       _pushState.apply(this, args)
       onNavigateListeners.forEach((l) => l())
     }
 
     history.replaceState = function (...args) {
-      console.log('replaceState', args)
       _replaceState.apply(this, args)
       onNavigateListeners.forEach((l) => l())
     }
 
     window.addEventListener('popstate', () => {
-      console.log('popstate')
       onNavigateListeners.forEach((l) => l())
     })
   }
