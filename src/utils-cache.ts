@@ -3,6 +3,7 @@ export const cache = {
   get: getCache,
   clear: clearCache,
   clearByPrefix: clearCacheByPrefix,
+  clearExpired: clearExpiredCache,
   hasByPrefix: hasCacheByPrefix,
 }
 
@@ -37,11 +38,26 @@ function clearCache(key: string) {
   localStorage.removeItem(key)
 }
 
-function clearCacheByPrefix(prefix: string) {
+function clearCacheByPrefix(prefix: string, except?: string[]) {
   prefix = 'npm-userscript:' + prefix
+  except = except?.map((k) => 'npm-userscript:' + k)
   Object.keys(localStorage).forEach((key) => {
-    if (key.startsWith(prefix)) {
+    if (key.startsWith(prefix) && !except?.includes(key)) {
       localStorage.removeItem(key)
+    }
+  })
+}
+
+function clearExpiredCache() {
+  Object.keys(localStorage).forEach((key) => {
+    if (key.startsWith('npm-userscript:')) {
+      const cached = localStorage.getItem(key)
+      if (cached) {
+        const expiredOn = /"expireOn":(\d+|null)}$/.exec(cached)?.[1]
+        if (expiredOn && expiredOn !== 'null' && Date.now() >= Number(expiredOn)) {
+          localStorage.removeItem(key)
+        }
+      }
     }
   })
 }

@@ -45,5 +45,5 @@ export function run() {
   }
 
   // Cleanup old keys
-  cache.clearByPrefix(bannerPrefix)
+  cache.clearByPrefix(bannerPrefix, [key])
 }
