@@ -1,3 +1,4 @@
+import { cache } from '../utils-cache.ts'
 import { addStyle } from '../utils.ts'
 
 export const description = `\
@@ -5,7 +6,7 @@ Remember the banner at the top of the page when dismissed, so it doesn't keep sh
 `
 // Because it was too hard to implement
 
-const bannerPrefix = 'npm-userscript-remember-banner:'
+const bannerPrefix = 'remember-banner:'
 const getBannerKey = (banner: Element) => {
   const text = banner.textContent.trim()
   const hash = btoa(encodeURIComponent(text)).slice(0, 16) + text.length
@@ -16,9 +17,7 @@ export function runPre() {
   // Pre-emptively hide the banner if we've previously closed any of it. We can't check the banner
   // element here as it might not exist yet.
 
-  const wasClosed = Object.keys(localStorage).some(
-    (key) => key.startsWith(bannerPrefix) && localStorage.getItem(key) === 'hide',
-  )
+  const wasClosed = cache.hasByPrefix(bannerPrefix)
 
   if (wasClosed) {
     addStyle(`
@@ -35,13 +34,16 @@ export function run() {
 
   const key = getBannerKey(banner)
 
-  if (localStorage.getItem(key) === 'hide') {
+  if (cache.get(key) === 'hide') {
     banner.remove()
   } else {
     banner.style.display = 'block'
     const closeButton = banner.querySelector('button')
     closeButton?.addEventListener('click', () => {
-      localStorage.setItem(key, 'hide')
+      cache.set(key, 'hide')
     })
   }
+
+  // Cleanup old keys
+  cache.clearByPrefix(bannerPrefix)
 }

@@ -1,3 +1,4 @@
+import { cache } from '../utils-cache.ts'
 import { addStyle, isValidPackagePage } from '../utils.ts'
 
 export const description = `\
@@ -73,6 +74,9 @@ function insertCountNode(ref: Element, name: string, count: number, link: string
 }
 
 async function getIssueAndPrCount(repo: string): Promise<{ issues: number; pulls: number }> {
+  const cached = cache.get(`issue-pr-count:${repo}`)
+  if (cached) return JSON.parse(cached)
+
   const issues = fetch(
     `https://api.github.com/search/issues?q=repo:${repo}+type:issue+state:open&per_page=0`,
   )
@@ -87,6 +91,8 @@ async function getIssueAndPrCount(repo: string): Promise<{ issues: number; pulls
     .then((data) => data.total_count)
     .catch(() => 0)
 
-  const result = await Promise.all([issues, pulls])
-  return { issues: result[0], pulls: result[1] }
+  const promises = await Promise.all([issues, pulls])
+  const result = { issues: promises[0], pulls: promises[1] }
+  cache.set(`issue-pr-count:${repo}`, JSON.stringify(result), 60) // Cache result for 1 minute
+  return result
 }
