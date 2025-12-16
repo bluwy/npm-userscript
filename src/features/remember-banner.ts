@@ -1,6 +1,9 @@
-// Because it was too hard to implement
+import { addStyle } from '../utils.ts'
 
-import { addStyle } from '../utils'
+export const description = `\
+Remember the banner at the top of the page when dismissed, so it doesn't keep showing up.
+`
+// Because it was too hard to implement
 
 const bannerPrefix = 'npm-userscript-remember-banner:'
 const getBannerKey = (banner: Element) => {

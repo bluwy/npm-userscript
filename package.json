@@ -7,7 +7,8 @@
     "dev": "node ./scripts/cli.ts dev",
     "build": "node ./scripts/cli.ts build",
     "typecheck": "tsc",
-    "format": "prettier --write \"**/*.ts\""
+    "format": "prettier --write \"**/*.ts\"",
+    "update-readme": "node ./scripts/update-readme.ts"
   },
   "devDependencies": {
     "@types/node": "^25.0.1",

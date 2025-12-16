@@ -1,4 +1,9 @@
-import { addStyle, listenNavigate } from '../utils'
+import { addStyle, listenNavigate } from '../utils.ts'
+
+export const description = `\
+Improved package versions tab with compact table view, show tags next to versions, and fix
+provenance icon alignment.
+`
 
 export function runPre() {
   if (!location.pathname.startsWith('/package/')) return

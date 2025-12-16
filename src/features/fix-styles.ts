@@ -1,5 +1,9 @@
 import { addStyle } from '../utils.ts'
 
+export const description = `\
+Fix various style issues on the npm site (mostly the package page at the moment).
+`
+
 export function runPre() {
   if (location.pathname.startsWith('/package/')) {
     // Remove extraneous padding and margin in sidebar

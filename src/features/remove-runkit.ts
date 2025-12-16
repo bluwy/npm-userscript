@@ -1,4 +1,6 @@
-// RunKit is dead and it's still there. Amazing.
+export const description = `\
+Remove the RunKit link as it's dead.
+`
 
 export function run() {
   if (!location.pathname.startsWith('/package/')) return

@@ -1,6 +1,9 @@
-// If the package is `create-*`, change the suggested install code as `npm create *`
+import { getPackageName } from '../utils.ts'
 
-import { getPackageName } from '../utils'
+export const description = `\
+If the package is named \`create-*\`, change the suggested install command in the sidebar as
+\`npm create *\` instead of \`npm install create-*\`.
+`
 
 export function run() {
   if (!location.pathname.startsWith('/package/')) return

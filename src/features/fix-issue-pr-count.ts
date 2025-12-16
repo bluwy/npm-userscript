@@ -1,7 +1,9 @@
-// At the time of writing, the "Issue" and "Pull Requests" info in the sidebar is broken for large
-// numbers for whatever reason. This file fixes it, hopefully temporarily.
+import { addStyle } from '../utils.ts'
 
-import { addStyle } from '../utils'
+export const description = `\
+Show "Issue" and "Pull Requests" counts in the package sidebar. At the time of writing, npm's own
+implementation is broken for large numbers for some reason. This temporarily fixes it.
+`
 
 export function runPre() {
   if (!location.pathname.startsWith('/package/')) return

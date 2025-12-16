@@ -1,5 +1,9 @@
 // Move the funding button to bottom
 
+export const description = `\
+Move the "Fund this package" button to the bottom of the sidebar.
+`
+
 export function run() {
   if (!location.pathname.startsWith('/package/')) return
 

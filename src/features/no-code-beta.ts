@@ -1,6 +1,8 @@
-// The code tab has been in beta for like 3 years now, it works fine without labelling as beta
+import { addStyle } from '../utils.ts'
 
-import { addStyle } from '../utils'
+export const description = `\
+Hide the "Beta" label in the package code tab because it has been working for around 3 years now.
+`
 
 export function runPre() {
   addStyle(`
