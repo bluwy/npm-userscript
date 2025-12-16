@@ -14,8 +14,11 @@ await build({
     'Library/Containers/com.userscripts.macos.Userscripts-Extension/Data/Documents/scripts',
   ),
   userscriptMeta: {
+    homepageURL: 'https://github.com/bluwy/npm-userscript',
+    supportURL: 'https://github.com/bluwy/npm-userscript',
     namespace: 'https://greasyfork.org/',
     match: 'https://www.npmjs.com/**',
+    icon: 'https://www.google.com/s2/favicons?sz=64&domain=npmjs.com',
     grant: 'none',
     'run-at': 'document-start',
   },

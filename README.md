@@ -1,5 +1,7 @@
 # Npm Userscript
 
+Various improvements and fixes for npmjs.com.
+
 ## Features
 
 <!-- features-table-start -->
