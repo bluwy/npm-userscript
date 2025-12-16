@@ -1,3 +1,5 @@
+const CACHE_PREFIX = 'npm-userscript:'
+
 export const cache = {
   set: setCache,
   get: getCache,
@@ -8,7 +10,7 @@ export const cache = {
 }
 
 function setCache(key: string, value: string, expirySeconds?: number) {
-  key = 'npm-userscript:' + key
+  key = CACHE_PREFIX + key
 
   const data = {
     value,
@@ -19,7 +21,7 @@ function setCache(key: string, value: string, expirySeconds?: number) {
 }
 
 function getCache(key: string): string | null {
-  key = 'npm-userscript:' + key
+  key = CACHE_PREFIX + key
 
   const cached = localStorage.getItem(key)
   if (!cached) return null
@@ -34,13 +36,13 @@ function getCache(key: string): string | null {
 }
 
 function clearCache(key: string) {
-  key = 'npm-userscript:' + key
+  key = CACHE_PREFIX + key
   localStorage.removeItem(key)
 }
 
 function clearCacheByPrefix(prefix: string, except?: string[]) {
-  prefix = 'npm-userscript:' + prefix
-  except = except?.map((k) => 'npm-userscript:' + k)
+  prefix = CACHE_PREFIX + prefix
+  except = except?.map((k) => CACHE_PREFIX + k)
   Object.keys(localStorage).forEach((key) => {
     if (key.startsWith(prefix) && !except?.includes(key)) {
       localStorage.removeItem(key)
@@ -50,7 +52,7 @@ function clearCacheByPrefix(prefix: string, except?: string[]) {
 
 function clearExpiredCache() {
   Object.keys(localStorage).forEach((key) => {
-    if (key.startsWith('npm-userscript:')) {
+    if (key.startsWith(CACHE_PREFIX)) {
       const cached = localStorage.getItem(key)
       if (cached) {
         const expiredOn = /"expireOn":(\d+|null)}$/.exec(cached)?.[1]
@@ -63,6 +65,6 @@ function clearExpiredCache() {
 }
 
 function hasCacheByPrefix(prefix: string): boolean {
-  prefix = 'npm-userscript:' + prefix
+  prefix = CACHE_PREFIX + prefix
   return Object.keys(localStorage).some((key) => key.startsWith(prefix))
 }
