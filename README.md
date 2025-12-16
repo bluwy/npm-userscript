@@ -1,5 +1,7 @@
 # Npm Userscript
 
+[Install on Greasyfork](https://greasyfork.org/en/scripts/559139-npm-userscript)
+
 Various improvements and fixes for npmjs.com.
 
 ## Features

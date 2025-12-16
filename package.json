@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "author": "Bjorn Lu",
+  "license": "MIT",
   "description": "Various improvements and fixes for npmjs.com",
   "type": "module",
   "scripts": {
