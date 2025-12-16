@@ -42,6 +42,14 @@ export function getPackageName(): string | undefined {
   }
 }
 
+export function isValidPackagePage(): boolean {
+  return (
+    location.pathname.startsWith('/package/') &&
+    // if is a valid package, should be like "package-name - npm"
+    document.title !== 'npm'
+  )
+}
+
 const onNavigateListeners: Function[] = []
 export function listenNavigate(listener: () => void) {
   if (onNavigateListeners.length === 0) {

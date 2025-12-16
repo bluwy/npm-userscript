@@ -1,11 +1,11 @@
-import { addStyle } from '../utils.ts'
+import { addStyle, isValidPackagePage } from '../utils.ts'
 
 export const description = `\
 Fix various style issues on the npm site (mostly the package page at the moment).
 `
 
 export function runPre() {
-  if (location.pathname.startsWith('/package/')) {
+  if (isValidPackagePage()) {
     // Remove extraneous padding and margin in sidebar
     addStyle(`
       #repository + p,

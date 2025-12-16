@@ -1,4 +1,4 @@
-import { addStyle } from '../utils.ts'
+import { addStyle, isValidPackagePage } from '../utils.ts'
 
 export const description = `\
 Show "Issue" and "Pull Requests" counts in the package sidebar. At the time of writing, npm's own
@@ -6,7 +6,7 @@ implementation is broken for large numbers for some reason. This temporarily fix
 `
 
 export function runPre() {
-  if (!location.pathname.startsWith('/package/')) return
+  if (!isValidPackagePage()) return
 
   addStyle(`
     #issues + p,
@@ -23,7 +23,7 @@ export function runPre() {
 }
 
 export async function run() {
-  if (!location.pathname.startsWith('/package/')) return
+  if (!isValidPackagePage()) return
 
   // Wait 2 seconds to allow npm to render first in case it works
   await new Promise((resolve) => setTimeout(resolve, 2000))

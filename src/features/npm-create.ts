@@ -1,4 +1,4 @@
-import { getPackageName } from '../utils.ts'
+import { getPackageName, isValidPackagePage } from '../utils.ts'
 
 export const description = `\
 If the package is named \`create-*\`, change the suggested install command in the sidebar as
@@ -6,7 +6,7 @@ If the package is named \`create-*\`, change the suggested install command in th
 `
 
 export function run() {
-  if (!location.pathname.startsWith('/package/')) return
+  if (!isValidPackagePage()) return
 
   const packageName = getPackageName()
   if (!packageName) return

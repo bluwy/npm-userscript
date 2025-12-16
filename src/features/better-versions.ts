@@ -1,4 +1,4 @@
-import { addStyle, listenNavigate } from '../utils.ts'
+import { addStyle, isValidPackagePage, listenNavigate } from '../utils.ts'
 
 export const description = `\
 Improved package versions tab with compact table view, show tags next to versions, and fix
@@ -11,7 +11,7 @@ interface VersionInfo {
 }
 
 export function runPre() {
-  if (!location.pathname.startsWith('/package/')) return
+  if (!isValidPackagePage()) return
 
   // Make row compact
   addStyle(`
@@ -87,7 +87,7 @@ export function run() {
 }
 
 function _run() {
-  if (!location.pathname.startsWith('/package/')) return
+  if (!isValidPackagePage()) return
 
   addVersionTag()
   addCumulatedVersionsTable()

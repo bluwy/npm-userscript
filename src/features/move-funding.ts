@@ -1,11 +1,13 @@
 // Move the funding button to bottom
 
+import { isValidPackagePage } from '../utils'
+
 export const description = `\
 Move the "Fund this package" button to the bottom of the sidebar.
 `
 
 export function run() {
-  if (!location.pathname.startsWith('/package/')) return
+  if (!isValidPackagePage()) return
 
   // Find funding button. This is poorly tagged, so we just find all the buttons in the sidebar and
   // look for one that contains "Fund this package" text
