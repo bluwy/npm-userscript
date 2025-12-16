@@ -53,3 +53,16 @@ export function runPre() {
     `)
   }
 }
+
+export function run() {
+  if (isValidPackagePage()) {
+    // "Last publish" should be "Last Publish" for consistency
+    const sidebar = document.querySelector('[aria-label="Package sidebar"]')
+    const el = Array.from(sidebar?.querySelectorAll('h3') || []).find(
+      (el) => el.textContent === 'Last publish',
+    )
+    if (el) {
+      el.textContent = 'Last Publish'
+    }
+  }
+}
