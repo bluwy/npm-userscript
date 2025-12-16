@@ -20,7 +20,7 @@ export async function waitForPageReady(): Promise<void> {
     }
   })
   // Additionally, wait for npm to hydrate
-  await new Promise((resolve) => setTimeout(resolve, 0))
+  await new Promise((resolve) => setTimeout(resolve, 100))
 }
 
 export function listenOnce<K extends keyof DocumentEventMap>(

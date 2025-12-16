@@ -21,6 +21,18 @@ export function runPre() {
       font-size: 1.25rem;
     }
   `)
+
+  addStyle(`
+    .npm-userscript-issue-pr-link {
+      text-decoration: none;
+    }
+
+    .npm-userscript-issue-pr-link:focus,
+    .npm-userscript-issue-pr-link:hover {
+      text-decoration: underline;
+      color: #cb3837;
+    }
+  `)
 }
 
 export async function run() {
@@ -50,17 +62,6 @@ export async function run() {
   // Just in case again, if npm has rendered them, skip
   if (document.getElementById('issues') || document.getElementById('pulls')) return
 
-  addStyle(`
-    .npm-userscript-issue-pr-link {
-      text-decoration: none;
-    }
-
-    .npm-userscript-issue-pr-link:focus,
-    .npm-userscript-issue-pr-link:hover {
-      text-decoration: underline;
-      color: #cb3837;
-    }
-  `)
   insertCountNode(ref, 'Pull Requests', counts.pulls, `https://github.com/${repo}/pulls`)
   insertCountNode(ref, 'Issues', counts.issues, `https://github.com/${repo}/issues`)
 }

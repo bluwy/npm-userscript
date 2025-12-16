@@ -23,6 +23,12 @@ export function run() {
   if (fundingButton) {
     // Put it after the collaborators section
     const collaboratorsSection = document.querySelector('div:has(> #collaborators)')
-    collaboratorsSection?.insertAdjacentElement('afterend', fundingButton)
+    collaboratorsSection?.insertAdjacentElement(
+      'afterend',
+      fundingButton.cloneNode(true) as Element,
+    )
+    // NOTE: Do not remove the funding button, otherwise it might mess with npm hydrating
+    // (which at this point it should have been hydrated, but just in case)
+    fundingButton.style.display = 'none'
   }
 }
