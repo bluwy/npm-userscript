@@ -6,6 +6,13 @@
   "license": "MIT",
   "description": "Various improvements and fixes for npmjs.com",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bluwy/npm-userscript.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bluwy/npm-userscript/issues"
+  },
   "scripts": {
     "dev": "node ./scripts/cli.ts dev",
     "build": "node ./scripts/cli.ts build",
