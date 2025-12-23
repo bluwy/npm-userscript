@@ -1,4 +1,5 @@
 import * as betterVersions from './features/better-versions.ts'
+// import * as dimMode from './features/dim-mode.ts'
 import * as fixIssuePrCount from './features/fix-issue-pr-count.ts'
 import * as fixStyles from './features/fix-styles.ts'
 import * as helpfulLinks from './features/helpful-links.ts'
@@ -25,6 +26,7 @@ export interface FeatureModule {
 
 export const allFeatures: Record<string, FeatureModule> = {
   'better-versions': betterVersions,
+  // 'dim-mode': dimMode,
   'fix-issue-pr-count': fixIssuePrCount,
   'fix-styles': fixStyles,
   'helpful-links': helpfulLinks,
