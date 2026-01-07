@@ -4,7 +4,7 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
-    "types": ["node"],
+    "types": ["node", "greasemonkey"],
     "noEmit": true,
     "strict": true
   }

@@ -1,19 +1,19 @@
 import { allFeatures } from './all-features.ts'
+import { getSettings, initSettings, injectSettingsTrigger } from './settings.ts'
 import { cache } from './utils-cache.ts'
 import { consolidateStyles, waitForPageReady } from './utils.ts'
 
-declare global {
-  const SETTINGS: {
-    features: Record<keyof typeof allFeatures, boolean>
-  }
-}
+main()
 
-runFeatures()
+async function main() {
+  await initSettings()
+  await runFeatures()
+}
 
 async function runFeatures() {
   // Run pre
   for (const feature in allFeatures) {
-    if (SETTINGS.features[feature] === false) continue
+    if (getSettings(`feature-${feature}`) === false) continue
     allFeatures[feature].runPre?.()?.catch((err) => {
       console.error(`Error running pre for feature "${feature}":`, err)
     })
@@ -25,7 +25,7 @@ async function runFeatures() {
 
   // Run normal
   for (const feature in allFeatures) {
-    if (SETTINGS.features[feature] === false) continue
+    if (getSettings(`feature-${feature}`) === false) continue
     allFeatures[feature].run?.()?.catch((err) => {
       console.error(`Error running feature "${feature}":`, err)
     })
@@ -33,4 +33,6 @@ async function runFeatures() {
   consolidateStyles()
 
   cache.clearExpired()
+
+  injectSettingsTrigger()
 }

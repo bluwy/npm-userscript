@@ -9,25 +9,8 @@ await build({
     namespace: 'https://greasyfork.org/en/scripts/559139-npm-userscript',
     match: 'https://www.npmjs.com/**',
     icon: 'https://www.google.com/s2/favicons?sz=64&domain=npmjs.com',
-    grant: 'none',
+    require: 'https://openuserjs.org/src/libs/sizzle/GM_config.js',
+    grant: ['GM.getValue', 'GM.setValue'],
     'run-at': 'document-start',
   },
-  esbuildOptions: {
-    banner: {
-      js: await getSettingsBanner(),
-    },
-  },
 })
-
-async function getSettingsBanner() {
-  const { allFeatures } = await import('../src/all-features.ts')
-  const banner = `\
-const SETTINGS = {
-  features: {
-${Object.entries(allFeatures)
-  .map(([name, feature]) => `    "${name}": ${feature.disabled ? 'false' : 'true'}`)
-  .join(',\n')}
-  }
-}`
-  return banner
-}

@@ -21,8 +21,9 @@
     "update-readme": "node ./scripts/update-readme.ts"
   },
   "devDependencies": {
-    "@types/node": "^25.0.1",
     "@bluwy/usb": "^0.1.3",
+    "@types/greasemonkey": "^4.0.7",
+    "@types/node": "^25.0.1",
     "prettier": "^3.7.4",
     "typescript": "^5.9.3"
   }
