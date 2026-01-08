@@ -112,6 +112,22 @@ export function listenNavigate(listener: () => void) {
   })
 }
 
+/**
+ * The sidebar has two-column layout that may have a row only with one column when we inject
+ * additional data, which causes the separator to be halved. This function with fix that by
+ * extending the column
+ */
+export function ensureSidebarBalance() {
+  const sidebar = document.querySelector('[aria-label="Package sidebar"]')
+  if (!sidebar) return
+
+  const halfWidthColumns = sidebar.querySelectorAll('div.w-50:not(.w-100)')
+  if (halfWidthColumns.length % 2 === 1) {
+    const lastColumn = halfWidthColumns[halfWidthColumns.length - 1]
+    lastColumn.classList.add('w-100')
+  }
+}
+
 // We need to do this shit because Safari Userscripts does not expose unsafeWindow. We need the `__context__`.
 async function extractNpmContext() {
   return new Promise((resolve) => {
