@@ -42,7 +42,11 @@ export async function run() {
   await new Promise((resolve) => setTimeout(resolve, 2000))
 
   // Skip if npm already renders them
-  if (document.getElementById('issues') || document.getElementById('pulls')) return
+  if (document.getElementById('issues') || document.getElementById('pulls')) {
+    // Just make sure they're on the same row
+    getTotalFilesColumn() // this function will automatically fix the layout
+    return
+  }
 
   const repositoryLink = document.getElementById('repository-link')
   const repo = repositoryLink?.textContent?.match(/github\.com\/([^\/]+\/[^\/]+)/)?.[1]
@@ -51,12 +55,7 @@ export async function run() {
   const counts = await getIssueAndPrCount(repo)
 
   // Place the counts in the sidebar after the "Total Files" section
-  const sidebar = document.querySelector('[aria-label="Package sidebar"]')
-  if (!sidebar) return
-
-  const ref = Array.from(sidebar.children).find((el) =>
-    el.querySelector('h3')?.textContent.includes('Total Files'),
-  )
+  const ref = getTotalFilesColumn()
   if (!ref) return
 
   // Just in case again, if npm has rendered them, skip
@@ -66,8 +65,27 @@ export async function run() {
   insertCountNode(ref, 'Issues', counts.issues, `https://github.com/${repo}/issues`)
 }
 
+function getTotalFilesColumn(): HTMLElement | undefined {
+  const sidebarColumns = document.querySelectorAll(
+    '[aria-label="Package sidebar"] div.w-50:not(.w-100)',
+  )
+  const refIndex = Array.from(sidebarColumns).findIndex((el) =>
+    el.querySelector('h3')?.textContent.includes('Total Files'),
+  )
+  if (refIndex === -1) return
+
+  const ref = sidebarColumns[refIndex] as HTMLElement
+  if (refIndex % 2 === 0) {
+    // The issue and pr count must be on the same row, so if the total files column's row isn't filled,
+    // we need to extend it to full width
+    ref.classList.add('w-100')
+  }
+  return ref
+}
+
 function insertCountNode(ref: Element, name: string, count: number, link: string) {
   const cloned = ref.cloneNode(true) as HTMLElement
+  cloned.classList.remove('w-100')
   cloned.querySelector('h3')!.textContent = name
   const linkHtml = `<a class="npm-userscript-issue-pr-link" href="${link}">${count}</a>`
   cloned.querySelector('p')!.innerHTML = linkHtml

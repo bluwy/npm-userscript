@@ -118,10 +118,9 @@ export function listenNavigate(listener: () => void) {
  * extending the column
  */
 export function ensureSidebarBalance() {
-  const sidebar = document.querySelector('[aria-label="Package sidebar"]')
-  if (!sidebar) return
-
-  const halfWidthColumns = sidebar.querySelectorAll('div.w-50:not(.w-100)')
+  const halfWidthColumns = document.querySelectorAll(
+    '[aria-label="Package sidebar"] div.w-50:not(.w-100)',
+  )
   if (halfWidthColumns.length % 2 === 1) {
     const lastColumn = halfWidthColumns[halfWidthColumns.length - 1]
     lastColumn.classList.add('w-100')
