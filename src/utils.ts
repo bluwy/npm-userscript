@@ -82,7 +82,9 @@ export function prettyBytes(bytes: number): string {
     bytes *= 0.001
     i++
   } while (bytes >= 1000 && i < units.length - 1)
-  return `${bytes.toFixed(2)} ${units[i]}`
+  const unit = units[i]
+  const num = unit === 'kB' ? Math.round(bytes) : bytes.toFixed(2)
+  return `${num} ${unit}`
 }
 
 const onNavigateListeners: Function[] = []
