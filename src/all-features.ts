@@ -8,6 +8,7 @@ import * as noCodeBeta from './features/no-code-beta.ts'
 import * as npmCreate from './features/npm-create.ts'
 import * as rememberBanner from './features/remember-banner.ts'
 import * as removeRunkit from './features/remove-runkit.ts'
+import * as tarballSize from './features/tarball-size.ts'
 
 export interface FeatureModule {
   /**
@@ -39,4 +40,5 @@ export const allFeatures: Record<string, FeatureModule> = {
   'npm-create': npmCreate,
   'remember-banner': rememberBanner,
   'remove-runkit': removeRunkit,
+  'tarball-size': tarballSize,
 }
