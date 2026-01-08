@@ -87,22 +87,18 @@ export function prettyBytes(bytes: number): string {
 
 const onNavigateListeners: Function[] = []
 export function listenNavigate(listener: () => void) {
+  let lastHref = location.href
+
   if (onNavigateListeners.length === 0) {
-    const _pushState = history.pushState
-    const _replaceState = history.replaceState
-
-    history.pushState = function (...args) {
-      _pushState.apply(this, args)
-      onNavigateListeners.forEach((l) => l())
-    }
-
-    history.replaceState = function (...args) {
-      _replaceState.apply(this, args)
-      onNavigateListeners.forEach((l) => l())
-    }
-
-    window.addEventListener('popstate', () => {
-      onNavigateListeners.forEach((l) => l())
+    // Because we're using `inject-into: content`, we can't detect the page has navigated via
+    // history api. We need to do some lame detection.
+    document.addEventListener('click', () => {
+      setTimeout(() => {
+        if (location.href !== lastHref) {
+          lastHref = location.href
+          onNavigateListeners.forEach((l) => l())
+        }
+      }, 100)
     })
   }
 
