@@ -5,6 +5,7 @@
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "types": ["node", "greasemonkey"],
+    "alwaysStrict": false,
     "noEmit": true,
     "strict": true
   }
