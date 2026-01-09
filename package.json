@@ -21,7 +21,8 @@
     "update-readme": "node ./scripts/update-readme.ts"
   },
   "dependencies": {
-    "get-npm-tarball-url": "^2.1.0"
+    "get-npm-tarball-url": "^2.1.0",
+    "uhtml": "^5.0.9"
   },
   "devDependencies": {
     "@bluwy/usb": "^0.1.3",
