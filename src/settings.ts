@@ -2,8 +2,8 @@ import { html, signal } from 'uhtml'
 import { allFeatures } from './all-features.ts'
 
 // NOTE: We use localStorage since it's sync and allow us to inject styles as soon as possible,
-// which prevents FOUC. This works well enough since this script works for npmjs.com only, but
-// its state may be lost if the user clears site data.
+// which prevents CLS. This works well enough since this script works for npmjs.com only, but its
+// state may be lost if the user clears site data.
 
 interface LocalStorageStore<T> {
   get(): T
