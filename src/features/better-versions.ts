@@ -150,7 +150,7 @@ function addCumulatedVersionsTable() {
     const publishedTd = row.querySelector('td:nth-child(3)')
     if (!downloadsTd || !publishedTd) return
     const downloadsText = downloadsTd.textContent || '0'
-    const downloads = parseInt(downloadsText.replace(/,|\./g, ''), 10) || 0
+    const downloads = parseInt(downloadsText.replace(/,|\.|\s/g, ''), 10) || 0
     const publishedText = publishedTd.textContent || ''
 
     if (!majorToInfo[major]) {
