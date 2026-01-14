@@ -17,15 +17,22 @@ export async function run() {
 
   // Inject after the "Unpacked size" column
   const sidebarColumns = document.querySelectorAll('[aria-label="Package sidebar"] > div:has(> h3)')
-  const unpackedSizeColumn = Array.from(sidebarColumns).find(
+  let columnToInsertAfter = Array.from(sidebarColumns).find(
     (col) => col.querySelector('h3')?.textContent === 'Unpacked Size',
   )
-  if (!unpackedSizeColumn) return
+  if (!columnToInsertAfter) {
+    // For older packages, there may be no "Unpacked size" or "Total Files" data, so use the
+    // "License" column as fallback. e.g. https://www.npmjs.com/package/mark.js
+    columnToInsertAfter = Array.from(sidebarColumns).find(
+      (col) => col.querySelector('h3')?.textContent === 'License',
+    )
+  }
+  if (!columnToInsertAfter) return
 
-  const tarballSizeColumn = unpackedSizeColumn.cloneNode(true) as HTMLElement
+  const tarballSizeColumn = columnToInsertAfter.cloneNode(true) as HTMLElement
   tarballSizeColumn.querySelector('h3')!.textContent = 'Tarball Size'
   tarballSizeColumn.querySelector('p')!.textContent = tarballSize
-  unpackedSizeColumn.insertAdjacentElement('afterend', tarballSizeColumn)
+  columnToInsertAfter.insertAdjacentElement('afterend', tarballSizeColumn)
 }
 
 async function getTarballSize(
