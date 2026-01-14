@@ -16,17 +16,7 @@ export async function run() {
   if (!tarballSize) return
 
   // Inject after the "Unpacked size" column
-  const sidebarColumns = document.querySelectorAll('[aria-label="Package sidebar"] > div:has(> h3)')
-  let columnToInsertAfter = Array.from(sidebarColumns).find(
-    (col) => col.querySelector('h3')?.textContent === 'Unpacked Size',
-  )
-  if (!columnToInsertAfter) {
-    // For older packages, there may be no "Unpacked size" or "Total Files" data, so use the
-    // "License" column as fallback. e.g. https://www.npmjs.com/package/mark.js
-    columnToInsertAfter = Array.from(sidebarColumns).find(
-      (col) => col.querySelector('h3')?.textContent === 'License',
-    )
-  }
+  const columnToInsertAfter = await getColumnToInsertAfter()
   if (!columnToInsertAfter) return
 
   const tarballSizeColumn = columnToInsertAfter.cloneNode(true) as HTMLElement
@@ -54,4 +44,39 @@ async function getTarballSize(
   if (!contentLength) return undefined
 
   return prettyBytes(parseInt(contentLength, 10))
+}
+
+async function getColumnToInsertAfter() {
+  const column = getColumnByName('Unpacked Size')
+  if (column) return column
+
+  const featureSettings = await getFeatureSettings()
+
+  // Possibly the column will be added in a while, so wait with a 5sec timeout
+  if (featureSettings['unpacked-size-and-total-files'].get() === true) {
+    let checks = 10 // 10 checks with 500ms interval = 5 seconds
+    setInterval(() => {
+      const column = getColumnByName('Unpacked Size')
+      if (column || --checks <= 0) {
+        return column
+      }
+    }, 500)
+  }
+  // Otherwise just add to the license column
+  else {
+    const column = getColumnByName('License')
+    return column
+  }
+}
+
+function getColumnByName(name: string) {
+  const sidebarColumns = document.querySelectorAll('[aria-label="Package sidebar"] > div:has(> h3)')
+  return Array.from(sidebarColumns).find((col) => col.querySelector('h3')?.textContent === name) as
+    | HTMLElement
+    | undefined
+}
+
+async function getFeatureSettings() {
+  const settings = await import('../settings.ts')
+  return settings.featureSettings
 }
