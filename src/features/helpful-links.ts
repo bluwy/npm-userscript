@@ -1,6 +1,6 @@
 import { addStyle, getPackageName, isValidPackagePage } from '../utils.ts'
 
-export const description = 'Add helpful links beside the package name title for convenience.'
+export const description = 'Add helpful links beside the package header for convenience.'
 
 interface LinkData {
   label: string
@@ -13,14 +13,11 @@ export function runPre() {
 
   addStyle(`
     .npm-userscript-helpful-links {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 8px;
-      margin-left: 8px;
-    }
-    /* More spacing if no dts icon */
-    span + .npm-userscript-helpful-links {
-      margin-left: 16px;
+      height: 0;
+      transform: translateY(5px);
     }
 
     .npm-userscript-helpful-links a {
@@ -31,11 +28,6 @@ export function runPre() {
       display: block;
       width: 20px;
       height: 20px;
-    }
-
-    /* align vertically center */
-    h1 > div[data-nosnippet="true"] {
-      display: flex;
     }
 
     /* link icon is jarringly large, so shrink */
@@ -68,11 +60,14 @@ export function run() {
     getBundlejsLinkData(packageName),
   ].filter(Boolean) as LinkData[]
 
-  const group = document.createElement('div')
-  group.className = 'npm-userscript-helpful-links'
-  group.innerHTML = links
-    .map(
-      (link) => `
+  const injectParent = document.querySelector('#top > div:first-child')
+  if (!injectParent) return
+
+  const group = injectParent.lastElementChild!.cloneNode() as HTMLElement
+  group.innerHTML = `&nbsp;•&nbsp;<div class="npm-userscript-helpful-links">
+    ${links
+      .map(
+        (link) => `
         <a
           href="${link.url}"
           target="_blank"
@@ -82,21 +77,11 @@ export function run() {
           ${scopeSvgId(link.iconSvg, link.label.toLowerCase().replace(/\s+/g, '-'))}
         </a>
       `,
-    )
-    .join('')
+      )
+      .join('')}
+  <div>`
 
-  const titleEl = document.querySelector('#top h1')
-  if (!titleEl) return
-  titleEl.appendChild(group)
-
-  // The title el might be re-rendered by npm, so observe it
-  const observer = new MutationObserver(() => {
-    const existing = document.querySelector('.npm-userscript-helpful-links')
-    if (!existing) {
-      titleEl.appendChild(group)
-    }
-  })
-  observer.observe(titleEl, { childList: true })
+  injectParent.appendChild(group)
 }
 
 function getRepoLinkData(): LinkData | undefined {
