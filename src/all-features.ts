@@ -3,6 +3,7 @@ import * as dimMode from './features/dim-mode.ts'
 import * as fixIssuePrCount from './features/fix-issue-pr-count.ts'
 import * as fixStyles from './features/fix-styles.ts'
 import * as helpfulLinks from './features/helpful-links.ts'
+import * as moduleReplacements from './features/module-replacements.ts'
 import * as moveFunding from './features/move-funding.ts'
 import * as noCodeBeta from './features/no-code-beta.ts'
 import * as npmCreate from './features/npm-create.ts'
@@ -36,6 +37,7 @@ export const allFeatures: Record<string, FeatureModule> = {
   'fix-issue-pr-count': fixIssuePrCount,
   'fix-styles': fixStyles,
   'helpful-links': helpfulLinks,
+  'module-replacements': moduleReplacements,
   'move-funding': moveFunding,
   'no-code-beta': noCodeBeta,
   'npm-create': npmCreate,

@@ -21,6 +21,7 @@
     "update-readme": "node ./scripts/update-readme.ts"
   },
   "dependencies": {
+    "@floating-ui/dom": "^1.7.4",
     "get-npm-tarball-url": "^2.1.0",
     "uhtml": "^5.0.9"
   },
@@ -28,6 +29,7 @@
     "@bluwy/usb": "^0.1.3",
     "@types/greasemonkey": "^4.0.7",
     "@types/node": "^25.0.1",
+    "module-replacements": "^2.10.1",
     "prettier": "^3.7.4",
     "typescript": "^5.9.3"
   }

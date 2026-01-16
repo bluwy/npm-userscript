@@ -51,6 +51,13 @@ export function runPre() {
         margin-top: 4px;
       }
     `)
+
+    // Align TS info icon vertically center in header
+    addStyle(`
+      h1 > div[data-nosnippet="true"] {
+        display: flex;
+      }
+    `)
   }
 }
 
