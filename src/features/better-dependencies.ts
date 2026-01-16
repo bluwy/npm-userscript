@@ -18,7 +18,22 @@ export function runPre() {
       top: -0.6rem;
       opacity: 0.7;
     }
+  `)
+
+  // Hide with CSS since we need to teardown our added elements manually when navigating away,
+  // which can cause a flash of unrelated content. For some reason, npm isn't handling it for us
+  // like how it works in better-versions.
+  addStyle(`
     #tabpanel-dependencies[data-attribute="hidden"] {
+      display: none;
+    }
+  `)
+
+  // Hide all of the default content.
+  // NOTE: Maybe we should not be this aggressive in case the UI fails
+  addStyle(`
+    #tabpanel-dependencies > h2:not([data-npm-userscript-added]),
+    #tabpanel-dependencies > ul:not([data-npm-userscript-added]) {
       display: none;
     }
   `)
@@ -76,13 +91,17 @@ async function _run() {
       : []
 
     const newH2 = h2.cloneNode() as HTMLElement
+    newH2.setAttribute('data-npm-userscript-added', 'true')
     newH2.textContent = `${group.title} (${normalizedData.length})`
     elements.push(newH2)
 
     const newUl = ul.cloneNode() as HTMLElement
+    newUl.setAttribute('data-npm-userscript-added', 'true')
     newUl.ariaLabel = group.title
     for (const [depName, depVersion] of normalizedData) {
       const newLi = li.cloneNode(true) as HTMLElement
+      newLi.classList.remove('mr2')
+      newLi.classList.add('mr1')
       newLi.querySelector('a')!.innerHTML = `${depName} <sup>${depVersion}</sup>`
       newLi.querySelector('a')!.href = `/package/${encodeURIComponent(depName)}`
       newUl.appendChild(newLi)
@@ -90,10 +109,8 @@ async function _run() {
     elements.push(newUl)
   }
 
-  // Clear existing content. Mark display:none to not interfere with npm teardown
-  for (const child of Array.from(section.children)) {
-    ;(child as HTMLElement).style.display = 'none'
-  }
+  // NOTE: Do not delete the existing elements as npm react runtime still reference them for
+  // deletion later
   for (const el of elements) {
     section.appendChild(el)
   }
