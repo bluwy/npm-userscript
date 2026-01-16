@@ -27,7 +27,7 @@ export async function waitForPageReady(): Promise<void> {
   })
   await extractNpmContext()
   // Additionally, wait for npm to hydrate
-  await new Promise((resolve) => setTimeout(resolve, 100))
+  await new Promise((resolve) => setTimeout(resolve, 0))
 }
 
 export function listenOnce<K extends keyof DocumentEventMap>(
@@ -114,7 +114,7 @@ export function listenNavigate(listener: () => void) {
 
   onNavigateListeners.push(() => {
     // Delay to allow npm to render the new content. Sucks to hardcode but couldn't find a better way.
-    setTimeout(() => listener(), 100)
+    setTimeout(() => listener(), 0)
   })
 }
 
