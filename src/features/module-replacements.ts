@@ -102,8 +102,15 @@ function getReadmeInternalClassName() {
 }
 
 async function fetchDocumentedDocs(docPath: string) {
-  const url = `https://raw.githubusercontent.com/es-tooling/module-replacements/refs/heads/main/docs/modules/${docPath}.md`
-  let markdown = await fetch(url).then((res) => res.text())
+  let markdown = await fetch(
+    `https://api.github.com/repos/es-tooling/module-replacements/contents/docs/modules/${docPath}.md`,
+    {
+      headers: {
+        Accept: 'application/vnd.github.raw+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+    },
+  ).then((res) => res.text())
   // Delete initial content until after the first heading ended
   markdown = markdown.replace(/^([\s\S]*?\n)# .+?\n/, '')
 

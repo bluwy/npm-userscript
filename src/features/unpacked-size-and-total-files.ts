@@ -4,6 +4,8 @@ export const description = `\
 Display the "Unpacked Size" and "Total Files" columns for older packages that lack the data.
 `
 
+// This feature is needed for, e.g. https://www.npmjs.com/package/mark.js
+
 export async function run() {
   if (!isValidPackagePage()) return
 
