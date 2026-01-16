@@ -1,7 +1,7 @@
 import { getNpmTarballUrl, isValidPackagePage, prettyBytes } from '../utils.ts'
 
 export const description = `\
-Display the tarball size of the package
+Display the tarball size of the package.
 `
 
 export async function run() {

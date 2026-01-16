@@ -68,9 +68,12 @@ function Settings() {
         }
         #npm-userscript-settings .dialog {
           background-color: var(--background-color);
-          width: 400px;
+          width: 700px;
+          max-width: 90vw;
+          max-height: 90vh;
           padding: 16px;
           border-radius: 4px;
+          overflow-y: auto;
         }
         #npm-userscript-settings h2 {
           margin: 0;
@@ -81,10 +84,23 @@ function Settings() {
           color: var(--color-fg-muted);
         }
         #npm-userscript-settings .setting {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          margin: 4px 0;
+          display: grid;
+          grid-template-columns: auto 1fr;
+          grid-template-rows: auto auto;
+          margin: 0 0 10px 0;
+        }
+        #npm-userscript-settings .setting > input {
+          grid-area: 1 / 1 / 3 / 2;
+          margin: 3px 6px 0 0;
+        }
+        #npm-userscript-settings .setting > span {
+          grid-area: 1 / 2 / 2 / 3;
+          font-weight: bold;
+        }
+        #npm-userscript-settings .setting > p {
+          grid-area: 2 / 2 / 3 / 3; 
+          margin: 4px 0 0 0;
+          opacity: 0.6;
         }
         #npm-userscript-settings .footer {
           font-size: 12px;
@@ -100,14 +116,10 @@ function Settings() {
       </style>
       <div class="dialog" @click=${(e: Event) => e.stopPropagation()}>
         <h2>Npm Userscript Settings</h2>
-        <p class="features">Features (Hover for extended description)</p>
+        <p class="features">Features</p>
         ${Object.entries(featureStates).map(([name, state]) => {
           return html`
-            <label
-              class="setting"
-              key=${name}
-              title="${allFeatures[name].description.trim().replace(/\n/g, ' ')}"
-            >
+            <label class="setting" key=${name}>
               <input
                 type="checkbox"
                 .checked=${state.value}
@@ -118,6 +130,7 @@ function Settings() {
                 }}
               />
               <span>${name}</span>
+              <p>${allFeatures[name].description.trim().replace(/\n/g, ' ')}</p>
             </label>
           `
         })}

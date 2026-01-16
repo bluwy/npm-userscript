@@ -3,7 +3,7 @@ import { addPackageLabel, addPackageLabelStyle, computeFloatingUI } from '../uti
 import { addStyle, getPackageName, isValidPackagePage } from '../utils.ts'
 
 export const description = `\
-Suggest alternatives for the package based on "es-tooling/module-replacements" data set
+Suggest alternatives for the package based on "es-tooling/module-replacements" data set.
 `
 
 export function runPre() {
@@ -47,7 +47,6 @@ export async function run() {
 
       const popup = document.createElement('div')
       popup.className = 'npm-userscript-popup ' + getReadmeInternalClassName()
-      popup.textContent = replacement.docPath
       injectParent.appendChild(popup)
 
       let fetched = false
