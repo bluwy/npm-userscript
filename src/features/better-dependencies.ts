@@ -18,6 +18,9 @@ export function runPre() {
       top: -0.6rem;
       opacity: 0.7;
     }
+    #tabpanel-dependencies[data-attribute="hidden"] {
+      display: none;
+    }
   `)
 }
 
@@ -26,10 +29,11 @@ export function run() {
   listenNavigate(() => _run())
 }
 
-export async function _run() {
-  if (!isValidPackagePage()) return
-  if (new URLSearchParams(location.search).get('activeTab') !== 'dependencies') return
-  if (document.querySelector('[aria-label="Peer Dependencies"]')) return // Already ran
+async function _run() {
+  if (!isValidPackagePage()) return ensureTabEmptyOnAway()
+  if (new URLSearchParams(location.search).get('activeTab') !== 'dependencies')
+    return ensureTabEmptyOnAway()
+  if (document.querySelector('[aria-label="Peer Dependencies"]')) return
 
   const packageName = getPackageName()
   const packageVersion = getPackageVersion()
@@ -45,7 +49,6 @@ export async function _run() {
   const ul = section.querySelector('ul')!
   const li = section.querySelector('li')!
 
-  // SPlit peer deps
   const peerDependencies: Record<string, string> = {}
   const optionalPeerDependencies: Record<string, string> = {}
   if (packageJson.peerDependencies) {
@@ -87,18 +90,24 @@ export async function _run() {
     elements.push(newUl)
   }
 
-  // Clear existing content
-  section.innerHTML = ''
-  // Append new content
+  // Clear existing content. Mark display:none to not interfere with npm teardown
+  for (const child of Array.from(section.children)) {
+    ;(child as HTMLElement).style.display = 'none'
+  }
   for (const el of elements) {
     section.appendChild(el)
   }
 }
 
-export async function fetchPackageJson(
+async function fetchPackageJson(
   packageName: string,
   packageVersion: string,
 ): Promise<Record<string, any> | undefined> {
   const result = await fetch(`https://registry.npmjs.org/${packageName}/${packageVersion}`)
   return result.ok ? await result.json() : undefined
+}
+
+function ensureTabEmptyOnAway() {
+  const section = document.getElementById('tabpanel-dependencies')
+  if (section) section.innerHTML = ''
 }
