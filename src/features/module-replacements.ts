@@ -70,9 +70,8 @@ export async function run() {
       const popup = document.createElement('div')
       popup.className = 'npm-userscript-popup ' + getReadmeInternalClassName()
       popup.innerHTML = `\
-For Node.js v${replacement.nodeVersion} and later, use ${replacementText} instead. 
-<br>
-<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/${replacement.mdnPath}" target="_blank">See MDN docs</a>
+For Node.js v${replacement.nodeVersion} and later, use ${replacementText}. 
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/${replacement.mdnPath}" target="_blank">See MDN docs</a>.
 `
       injectParent.appendChild(popup)
 
