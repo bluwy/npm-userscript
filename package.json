@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.4",
-    "get-npm-tarball-url": "^2.1.0",
     "uhtml": "^5.0.9"
   },
   "devDependencies": {

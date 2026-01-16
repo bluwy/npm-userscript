@@ -1,5 +1,4 @@
-import getNpmTarballUrl from 'get-npm-tarball-url'
-import { getPackageName, getPackageVersion, isValidPackagePage, prettyBytes } from '../utils.ts'
+import { getNpmTarballUrl, isValidPackagePage, prettyBytes } from '../utils.ts'
 
 export const description = `\
 Display the tarball size of the package
@@ -8,11 +7,7 @@ Display the tarball size of the package
 export async function run() {
   if (!isValidPackagePage()) return
 
-  const packageName = getPackageName()
-  const packageVersion = getPackageVersion()
-  if (!packageName || !packageVersion) return
-
-  const tarballSize = await getTarballSize(packageName, packageVersion)
+  const tarballSize = await getTarballSize()
   if (!tarballSize) return
 
   // Inject after the "Unpacked size" column
@@ -25,16 +20,13 @@ export async function run() {
   columnToInsertAfter.insertAdjacentElement('afterend', tarballSizeColumn)
 }
 
-async function getTarballSize(
-  packageName: string,
-  packageVersion: string,
-): Promise<string | undefined> {
+async function getTarballSize(): Promise<string | undefined> {
   const controller = new AbortController()
 
-  const result = await fetch(getNpmTarballUrl(packageName, packageVersion), {
-    method: 'GET',
-    signal: controller.signal,
-  })
+  const tarballUrl = getNpmTarballUrl()
+  if (!tarballUrl) return undefined
+
+  const result = await fetch(tarballUrl, { signal: controller.signal })
 
   // Immediately abort, we just want to read headers. We use GET and not HEAD in this case
   // because npm doesn't return the Content-Length for the HEAD requests.
