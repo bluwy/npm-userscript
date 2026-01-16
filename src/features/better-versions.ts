@@ -88,6 +88,7 @@ export function run() {
 
 function _run() {
   if (!isValidPackagePage()) return
+  if (new URLSearchParams(location.search).get('activeTab') !== 'versions') return
 
   addVersionTag()
   addCumulatedVersionsTable()
