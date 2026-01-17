@@ -1,3 +1,4 @@
+import { fetchJson } from '../external-dependencies.ts'
 import {
   addStyle,
   getPackageName,
@@ -120,8 +121,7 @@ async function fetchPackageJson(
   packageName: string,
   packageVersion: string,
 ): Promise<Record<string, any> | undefined> {
-  const result = await fetch(`https://registry.npmjs.org/${packageName}/${packageVersion}`)
-  return result.ok ? await result.json() : undefined
+  return await fetchJson(`https://registry.npmjs.org/${packageName}/${packageVersion}`)
 }
 
 function ensureTabEmptyOnAway() {

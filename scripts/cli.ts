@@ -9,8 +9,9 @@ await build({
     namespace: 'https://greasyfork.org/en/scripts/559139-npm-userscript',
     match: 'https://www.npmjs.com/**',
     icon: 'https://www.google.com/s2/favicons?sz=64&domain=npmjs.com',
-    grant: 'none',
-    'inject-into': 'content', // required to bypass CSP
+    grant: ['GM.xmlHttpRequest'],
+    connect: ['cdn.jsdelivr.net', 'registry.npmjs.org'],
+    'inject-into': 'content', // run in isolated context
     'run-at': 'document-start',
   },
 })

@@ -1,3 +1,4 @@
+import { fetchHeaders } from '../external-dependencies.ts'
 import { getNpmTarballUrl, isValidPackagePage, prettyBytes } from '../utils.ts'
 
 export const description = `\
@@ -21,18 +22,12 @@ export async function run() {
 }
 
 async function getTarballSize(): Promise<string | undefined> {
-  const controller = new AbortController()
-
   const tarballUrl = getNpmTarballUrl()
   if (!tarballUrl) return undefined
 
-  const result = await fetch(tarballUrl, { signal: controller.signal })
+  const result = await fetchHeaders(tarballUrl)
 
-  // Immediately abort, we just want to read headers. We use GET and not HEAD in this case
-  // because npm doesn't return the Content-Length for the HEAD requests.
-  controller.abort()
-
-  const contentLength = result.headers.get('Content-Length')
+  const contentLength = /content-length:(\d+)/.exec('' + result)?.[1]
   if (!contentLength) return undefined
 
   return prettyBytes(parseInt(contentLength, 10))
