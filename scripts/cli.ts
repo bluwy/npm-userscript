@@ -10,7 +10,7 @@ await build({
     match: 'https://www.npmjs.com/**',
     icon: 'https://www.google.com/s2/favicons?sz=64&domain=npmjs.com',
     grant: ['GM.xmlHttpRequest'],
-    connect: ['cdn.jsdelivr.net', 'registry.npmjs.org'],
+    connect: ['api.github.com', 'cdn.jsdelivr.net', 'registry.npmjs.org'],
     'inject-into': 'content', // run in isolated context
     'run-at': 'document-start',
   },

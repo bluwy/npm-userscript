@@ -1,4 +1,4 @@
-import { fetchHeaders } from '../external-dependencies.ts'
+import { fetchHeaders } from '../utils-fetch.ts'
 import { getNpmTarballUrl, isValidPackagePage, prettyBytes } from '../utils.ts'
 
 export const description = `\

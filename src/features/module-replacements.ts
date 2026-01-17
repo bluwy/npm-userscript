@@ -1,4 +1,5 @@
-import { getModuleReplacements } from '../external-dependencies.ts'
+import type { ModuleReplacement } from 'module-replacements'
+import { fetchJson, fetchText } from '../utils-fetch.ts'
 import { addPackageLabel, addPackageLabelStyle, computeFloatingUI } from '../utils-ui.ts'
 import { addStyle, getPackageName, isValidPackagePage } from '../utils.ts'
 
@@ -101,8 +102,25 @@ function getReadmeInternalClassName() {
     .join(' ')
 }
 
+// https://github.com/es-tooling/module-replacements
+async function getModuleReplacements(): Promise<ModuleReplacement[]> {
+  const results = [
+    fetchJson('https://cdn.jsdelivr.net/npm/module-replacements@2/manifests/micro-utilities.json'),
+    fetchJson('https://cdn.jsdelivr.net/npm/module-replacements@2/manifests/native.json'),
+    fetchJson('https://cdn.jsdelivr.net/npm/module-replacements@2/manifests/preferred.json'),
+  ]
+
+  const [microUtilities, native, preferred] = await Promise.all(results)
+
+  return [
+    ...microUtilities.moduleReplacements,
+    ...native.moduleReplacements,
+    ...preferred.moduleReplacements,
+  ]
+}
+
 async function fetchDocumentedDocs(docPath: string) {
-  let markdown = await fetch(
+  let markdown = await fetchText(
     `https://api.github.com/repos/es-tooling/module-replacements/contents/docs/modules/${docPath}.md`,
     {
       headers: {
@@ -110,11 +128,11 @@ async function fetchDocumentedDocs(docPath: string) {
         'X-GitHub-Api-Version': '2022-11-28',
       },
     },
-  ).then((res) => res.text())
+  )
   // Delete initial content until after the first heading ended
   markdown = markdown.replace(/^([\s\S]*?\n)# .+?\n/, '')
 
-  const html = await fetch('https://api.github.com/markdown', {
+  const html = await fetchText('https://api.github.com/markdown', {
     method: 'POST',
     headers: {
       Accept: 'text/html',
@@ -125,7 +143,7 @@ async function fetchDocumentedDocs(docPath: string) {
       mode: 'gfm',
       context: 'es-tooling/module-replacements',
     }),
-  }).then((res) => res.text())
+  })
 
   return html
 }

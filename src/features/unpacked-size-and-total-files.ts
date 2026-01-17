@@ -1,3 +1,4 @@
+import { fetchJson } from '../utils-fetch.ts'
 import { getPackageName, getPackageVersion, isValidPackagePage, prettyBytes } from '../utils.ts'
 
 export const description = `\
@@ -46,9 +47,9 @@ export async function run() {
 
 async function getData(packageName: string, packageVersion: string) {
   // This uses the same data from the code tab
-  const url = `https://www.npmjs.com/package/${packageName}/v/${packageVersion}/index`
-  const response = await fetch(url)
-  const data = await response.json()
+  const data = await fetchJson(
+    `https://www.npmjs.com/package/${packageName}/v/${packageVersion}/index`,
+  )
   return {
     unpackedSize: data.totalSize,
     totalFiles: data.fileCount,

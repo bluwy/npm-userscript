@@ -1,4 +1,5 @@
 import { cache } from '../utils-cache.ts'
+import { fetchJson } from '../utils-fetch.ts'
 import { addStyle, isValidPackagePage } from '../utils.ts'
 
 export const description = `\
@@ -96,17 +97,15 @@ async function getIssueAndPrCount(repo: string): Promise<{ issues: number; pulls
   const cached = cache.get(`issue-pr-count:${repo}`)
   if (cached) return JSON.parse(cached)
 
-  const issues = fetch(
+  const issues = fetchJson(
     `https://api.github.com/search/issues?q=repo:${repo}+type:issue+state:open&per_page=0`,
   )
-    .then((res) => res.json())
     .then((data) => data.total_count ?? 0)
     .catch(() => 0)
 
-  const pulls = fetch(
+  const pulls = fetchJson(
     `https://api.github.com/search/issues?q=repo:${repo}+type:pr+state:open&per_page=0`,
   )
-    .then((res) => res.json())
     .then((data) => data.total_count ?? 0)
     .catch(() => 0)
 

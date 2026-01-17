@@ -1,4 +1,4 @@
-import { fetchJson } from '../external-dependencies.ts'
+import { fetchJson } from '../utils-fetch.ts'
 import {
   addStyle,
   getPackageName,
