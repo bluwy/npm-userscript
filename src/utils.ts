@@ -1,9 +1,3 @@
-declare global {
-  interface Window {
-    __context__: any
-  }
-}
-
 const styles: string[] = []
 
 export function addStyle(css: string) {
@@ -57,11 +51,7 @@ export function getPackageVersion(): string | undefined {
   if (match) return match[1]
 
   // Otherwise, extract from internal variable
-  try {
-    return unsafeWindow.__context__.context.packageVersion.version
-  } catch {}
-
-  // Could actually try to read the html element but meh
+  return getNpmContext().context.packageVersion.version
 }
 
 export function isValidPackagePage(): boolean {
@@ -73,11 +63,9 @@ export function isValidPackagePage(): boolean {
 }
 
 export function getNpmTarballUrl() {
-  try {
-    const packument = unsafeWindow.__context__.context.packument
-    const versionData = packument.versions.find((v: any) => (v.version = packument.version))
-    return versionData.dist.tarball as string
-  } catch {}
+  const packument = getNpmContext().context.packument
+  const versionData = packument.versions.find((v: any) => (v.version = packument.version))
+  return versionData.dist.tarball as string
 }
 
 export function prettyBytes(bytes: number): string {
@@ -133,9 +121,22 @@ export function ensureSidebarBalance() {
   }
 }
 
-// We need to do this shit because Safari Userscripts does not expose unsafeWindow. We need the `__context__`.
+let _npmContext: any = null
+
+/**
+ * Get the `window.__context__` object from the npm page
+ */
+export function getNpmContext() {
+  if (_npmContext == null) {
+    throw new Error('Npm context not yet extracted')
+  }
+  return _npmContext
+}
+
+// In many userscripts we can't rely on `unsafeWindow` to access page variables, so we need to do
+// this trick to extract the stuff we need.
 async function extractNpmContext() {
-  return new Promise((resolve) => {
+  return new Promise<void>((resolve) => {
     const elementId = 'npm-userscript-context'
     const elementEvent = 'npm-userscript-done'
     const script = document.createElement('script')
@@ -147,11 +148,9 @@ async function extractNpmContext() {
     script.addEventListener(
       elementEvent,
       () => {
-        const context = JSON.parse(script.dataset.value || '{}')
+        _npmContext = JSON.parse(script.dataset.value || '{}')
         script.remove()
-        window.__context__ = context
-        window.unsafeWindow = window
-        resolve(context)
+        resolve()
       },
       { once: true },
     )

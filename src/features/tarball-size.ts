@@ -27,7 +27,7 @@ async function getTarballSize(): Promise<string | undefined> {
 
   const result = await fetchHeaders(tarballUrl)
 
-  const contentLength = /content-length:(\d+)/.exec('' + result)?.[1]
+  const contentLength = /content-length:\s*(\d+)/.exec(result)?.[1]
   if (!contentLength) return undefined
 
   return prettyBytes(parseInt(contentLength, 10))
