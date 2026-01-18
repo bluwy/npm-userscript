@@ -15,13 +15,20 @@ export async function run() {
   const packageJson = await fetchPackageJson()
   if (!packageJson) return
 
-  if (!hasNativeBinaries(packageJson)) return
+  if (shipsNativeBinaries(packageJson)) {
+    const label = addPackageLabel('ships binaries', 'info')
+    label.title = 'This package ships prebuilt native binaries via optional dependencies'
+    return
+  }
 
-  const label = addPackageLabel('native', 'info')
-  label.title = 'This package ships prebuilt native binaries via optional dependencies'
+  const nativeInfo = isNativeBinary(packageJson)
+  if (nativeInfo) {
+    const label = addPackageLabel(`${nativeInfo} binary`, 'info')
+    label.title = `This package ships prebuilt native binary for ${nativeInfo}`
+  }
 }
 
-function hasNativeBinaries(packageJson: Record<string, any>): boolean {
+function shipsNativeBinaries(packageJson: Record<string, any>): boolean {
   const optionalDependencies = Object.keys(packageJson.optionalDependencies || {})
   if (optionalDependencies.length <= 0) return false
 
@@ -39,4 +46,18 @@ function hasNativeBinaries(packageJson: Record<string, any>): boolean {
   }
 
   return false
+}
+
+function isNativeBinary(packageJson: Record<string, any>): string | false {
+  const os = packageJson.os ?? []
+  if (os.length === 0) return false
+
+  let str = os.join(', ')
+
+  const cpu = packageJson.cpu ?? []
+  if (cpu.length > 0) {
+    str += ` ${cpu.join(', ')}`
+  }
+
+  return str
 }
