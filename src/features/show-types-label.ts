@@ -1,4 +1,3 @@
-import { fetchPackageJson } from '../utils-fetch.ts'
 import { addPackageLabel, addPackageLabelStyle } from '../utils-ui.ts'
 import { addStyle, getNpmContext, isValidPackagePage } from '../utils.ts'
 
@@ -18,11 +17,8 @@ export function runPre() {
   `)
 }
 
-export async function run() {
+export function run() {
   if (!isValidPackagePage()) return
-
-  const packageJson = await fetchPackageJson()
-  if (!packageJson) return
 
   const typesInfo = parseNpmTypes()
   if (typesInfo.type === 'none') {

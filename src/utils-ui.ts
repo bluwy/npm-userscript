@@ -42,8 +42,9 @@ export function addPackageLabelStyle() {
 
 const PACKAGE_LABEL_ORDER = {
   'show-types-label': 10,
-  'show-binary-label': 20,
-  'module-replacements': 30,
+  'show-engine-label': 20,
+  'show-binary-label': 30,
+  'module-replacements': 40,
 } as const
 
 const insertedLabels: HTMLElement[] = []

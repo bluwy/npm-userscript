@@ -1,3 +1,5 @@
+const HYDRATION_DELAY_MS = 50
+
 const styles: string[] = []
 
 export function addStyle(css: string) {
@@ -21,7 +23,7 @@ export async function waitForPageReady(): Promise<void> {
   })
   await extractNpmContext()
   // Additionally, wait for npm to hydrate
-  await new Promise((resolve) => setTimeout(resolve, 0))
+  await new Promise((resolve) => setTimeout(resolve, HYDRATION_DELAY_MS))
 }
 
 export function listenOnce<K extends keyof DocumentEventMap>(
@@ -102,7 +104,7 @@ export function listenNavigate(listener: () => void) {
 
   onNavigateListeners.push(() => {
     // Delay to allow npm to render the new content. Sucks to hardcode but couldn't find a better way.
-    setTimeout(() => listener(), 0)
+    setTimeout(() => listener(), HYDRATION_DELAY_MS)
   })
 }
 
