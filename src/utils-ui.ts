@@ -48,11 +48,6 @@ export function addPackageLabelStyle() {
       background-color: #f8d7da;
       border-color: #f5c6cb;
     }
-
-    /* More spacing if no dts icon */
-    span + .npm-userscript-package-label {
-      margin-left: 16px;
-    }
   `)
 }
 

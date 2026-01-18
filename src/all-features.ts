@@ -11,6 +11,7 @@ import * as npmCreate from './features/npm-create.ts'
 import * as rememberBanner from './features/remember-banner.ts'
 import * as removeRunkit from './features/remove-runkit.ts'
 import * as showBinaryLabel from './features/show-binary-label.ts'
+import * as showTypesLabel from './features/show-types-label.ts'
 import * as tarballSize from './features/tarball-size.ts'
 import * as unpackedSizeAndTotalFiles from './features/unpacked-size-and-total-files.ts'
 
@@ -47,6 +48,7 @@ export const allFeatures: Record<string, FeatureModule> = {
   'remember-banner': rememberBanner,
   'remove-runkit': removeRunkit,
   'show-binary-label': showBinaryLabel,
+  'show-types-label': showTypesLabel,
   'tarball-size': tarballSize,
   'unpacked-size-and-total-files': unpackedSizeAndTotalFiles,
 }
