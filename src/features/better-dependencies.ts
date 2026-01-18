@@ -21,6 +21,13 @@ export function runPre() {
     }
   `)
 
+  // This is for fallback only if the page has no `li` and we use our own hardcoded fallback
+  addStyle(`
+    #tabpanel-dependencies li > a {
+      color: var(--wombat-red);
+    }
+  `)
+
   // Hide with CSS since we need to teardown our added elements manually when navigating away,
   // which can cause a flash of unrelated content. For some reason, npm isn't handling it for us
   // like how it works in better-versions.
@@ -63,7 +70,15 @@ async function _run() {
   // Grab existing elements to preserve styling
   const h2 = section.querySelector('h2')!
   const ul = section.querySelector('ul')!
-  const li = section.querySelector('li')!
+  const li =
+    section.querySelector('li') ??
+    (() => {
+      // Fallback in case the package has no deps or dev deps. This may need to be updated if npm changes.
+      const el = document.createElement('li')
+      el.className = 'dib mr2'
+      el.innerHTML = `<a class="f4 fw6 fl db pv1 ma2 black-70 link hover-black animate" href=""></a>`
+      return el
+    })()
 
   const peerDependencies: Record<string, string> = {}
   const optionalPeerDependencies: Record<string, string> = {}
