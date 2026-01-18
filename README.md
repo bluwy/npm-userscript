@@ -24,8 +24,9 @@ Various improvements and fixes for npmjs.com.
 | `npm-create`                    | If the package is named `create-*`, change the suggested install command in the sidebar as `npm create *` instead of `npm install create-*`.                                             |
 | `remember-banner`               | Remember the banner at the top of the page when dismissed, so it doesn't keep showing up.                                                                                                |
 | `remove-runkit`                 | Remove the RunKit link as it's dead.                                                                                                                                                     |
-| `unpacked-size-and-total-files` | Display the "Unpacked Size" and "Total Files" columns for older packages that lack the data.                                                                                             |
+| `show-binary-label`             | Adds a label for packages that ship prebuilt native binaries.                                                                                                                            |
 | `tarball-size`                  | Display the tarball size of the package.                                                                                                                                                 |
+| `unpacked-size-and-total-files` | Display the "Unpacked Size" and "Total Files" columns for older packages that lack the data.                                                                                             |
 
 <!-- features-table-end -->
 

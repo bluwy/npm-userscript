@@ -22,13 +22,16 @@ export function addPackageLabelStyle() {
       border-radius: 4px;
       font-size: 0.9rem;
       font-weight: bold;
-      cursor: pointer;
       border-style: solid;
       border-width: 1px;
       margin-left: 12px;
       gap: 3px;
       align-items: center;
       padding: 2px 4px;
+      letter-spacing: normal;
+    }
+    button.npm-userscript-package-label {
+      cursor: pointer;
     }
     .npm-userscript-package-label.info {
       color: #004085;
@@ -53,15 +56,19 @@ export function addPackageLabelStyle() {
   `)
 }
 
-export function addPackageLabel(text: string, type: 'info' | 'warning' | 'error') {
+export function addPackageLabel(
+  innerHtml: string,
+  type: 'info' | 'warning' | 'error',
+  el: 'span' | 'button' = 'span',
+): HTMLElement {
   const titleEl = document.querySelector('#top h1')
   if (!titleEl) throw new Error('Could not find package title element')
 
   const svg = type === 'info' ? infoSvg : type === 'warning' ? warningSvg : errorSvg
 
-  const label = document.createElement('button')
+  const label = document.createElement(el)
   label.className = `npm-userscript-package-label ${type}`
-  label.innerHTML = svg + text
+  label.innerHTML = svg + innerHtml
   titleEl.appendChild(label)
   return label
 }

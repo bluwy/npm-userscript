@@ -1,3 +1,15 @@
+import { inMemoryCache } from './utils-cache.ts'
+import { getPackageName, getPackageVersion } from './utils.ts'
+
+export async function fetchPackageJson(): Promise<Record<string, any> | undefined> {
+  const packageName = getPackageName()
+  const packageVersion = getPackageVersion()
+  if (!packageName || !packageVersion) return undefined
+  return inMemoryCache(`fetchPackageJson:${packageName}@${packageVersion}`, () =>
+    fetchJson(`https://registry.npmjs.org/${packageName}/${packageVersion}`),
+  )
+}
+
 export interface FetchRequestInit extends Pick<RequestInit, 'method' | 'headers' | 'body'> {}
 
 export function fetchText(input: string | URL | Request, init?: FetchRequestInit): Promise<string> {

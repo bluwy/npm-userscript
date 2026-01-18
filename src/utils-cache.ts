@@ -68,3 +68,21 @@ function hasCacheByPrefix(prefix: string): boolean {
   prefix = CACHE_PREFIX + prefix
   return Object.keys(localStorage).some((key) => key.startsWith(prefix))
 }
+
+const _inMemoryCache: Record<string, any> = {}
+export function inMemoryCache<T>(key: string, fn: () => T | Promise<T>): T | Promise<T> {
+  if (key in _inMemoryCache) {
+    return _inMemoryCache[key]
+  }
+
+  const result = fn()
+  _inMemoryCache[key] = result
+  // @ts-expect-error
+  if (result.then) {
+    // @ts-expect-error
+    result.then((resolved) => {
+      _inMemoryCache[key] = resolved
+    })
+  }
+  return result
+}

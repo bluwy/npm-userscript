@@ -1,11 +1,5 @@
-import { fetchJson } from '../utils-fetch.ts'
-import {
-  addStyle,
-  getPackageName,
-  getPackageVersion,
-  isValidPackagePage,
-  listenNavigate,
-} from '../utils.ts'
+import { fetchPackageJson } from '../utils-fetch.ts'
+import { addStyle, isValidPackagePage, listenNavigate } from '../utils.ts'
 
 export const description = `\
 Improved package dependencies tab with added peer dependencies info, optional dependencies info,
@@ -58,11 +52,7 @@ async function _run() {
     return ensureTabEmptyOnAway()
   if (document.querySelector('[aria-label="Peer Dependencies"]')) return
 
-  const packageName = getPackageName()
-  const packageVersion = getPackageVersion()
-  if (!packageName || !packageVersion) return
-
-  const packageJson = await fetchPackageJson(packageName, packageVersion)
+  const packageJson = await fetchPackageJson()
   if (!packageJson) return
 
   const section = document.getElementById('tabpanel-dependencies')
@@ -130,13 +120,6 @@ async function _run() {
   for (const el of elements) {
     section.appendChild(el)
   }
-}
-
-async function fetchPackageJson(
-  packageName: string,
-  packageVersion: string,
-): Promise<Record<string, any> | undefined> {
-  return await fetchJson(`https://registry.npmjs.org/${packageName}/${packageVersion}`)
 }
 
 function ensureTabEmptyOnAway() {

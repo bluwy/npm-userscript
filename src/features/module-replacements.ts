@@ -44,7 +44,7 @@ export async function run() {
 
   switch (replacement.type) {
     case 'documented': {
-      const label = addPackageLabel('see alternative packages', 'info')
+      const label = addPackageLabel('see alternative packages', 'info', 'button')
 
       const popup = document.createElement('div')
       popup.className = 'npm-userscript-popup ' + getReadmeInternalClassName()
@@ -63,7 +63,7 @@ export async function run() {
       break
     }
     case 'native': {
-      const label = addPackageLabel('prefer native code', 'warning')
+      const label = addPackageLabel('prefer native code', 'warning', 'button')
 
       let replacementText = replacement.replacement
       if (replacementText.startsWith('Use ')) replacementText = replacementText.slice(4)
@@ -80,7 +80,7 @@ For Node.js v${replacement.nodeVersion} and later, use ${replacementText}.
       break
     }
     case 'simple': {
-      const label = addPackageLabel('prefer simpler code', 'error')
+      const label = addPackageLabel('prefer simpler code', 'error', 'button')
 
       const popup = document.createElement('div')
       popup.className = 'npm-userscript-popup ' + getReadmeInternalClassName()
