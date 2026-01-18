@@ -21,10 +21,15 @@ export function runPre() {
       top: 0;
       left: 0;
       background: var(--background-color);
+      font-size: 90%;
       padding: 4px 8px;
       border-radius: 4px;
       border: 1px solid #aaa;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .npm-userscript-popup-documented {
+      transform-origin: 0 0;
+      transform: scale(0.8);
     }
   `)
 }
@@ -47,7 +52,8 @@ export async function run() {
       const label = addPackageLabel('see alternative packages', 'info', 'button')
 
       const popup = document.createElement('div')
-      popup.className = 'npm-userscript-popup ' + getReadmeInternalClassName()
+      popup.className =
+        'npm-userscript-popup npm-userscript-popup-documented ' + getReadmeInternalClassName()
       injectParent.appendChild(popup)
 
       let fetched = false
