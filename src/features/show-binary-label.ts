@@ -1,5 +1,5 @@
 import { fetchPackageJson } from '../utils-fetch.ts'
-import { addPackageLabel } from '../utils-ui.ts'
+import { addPackageLabel, addPackageLabelStyle } from '../utils-ui.ts'
 import { isValidPackagePage } from '../utils.ts'
 
 export const description = `\
@@ -8,6 +8,10 @@ Adds a label for packages that ship prebuilt native binaries.
 
 const popularOs = ['linux', 'darwin', 'win32']
 const popularArch = ['x64', 'arm64', 'ia32']
+
+export function runPre() {
+  addPackageLabelStyle()
+}
 
 export async function run() {
   if (!isValidPackagePage()) return

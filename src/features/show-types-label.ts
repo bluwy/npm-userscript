@@ -1,5 +1,5 @@
 import { fetchPackageJson } from '../utils-fetch.ts'
-import { addPackageLabel } from '../utils-ui.ts'
+import { addPackageLabel, addPackageLabelStyle } from '../utils-ui.ts'
 import { addStyle, getNpmContext, isValidPackagePage } from '../utils.ts'
 
 export const description = `\
@@ -10,6 +10,7 @@ with a more consistent UI.
 export const disabled = true
 
 export function runPre() {
+  addPackageLabelStyle()
   addStyle(`
     h1 > div[data-nosnippet="true"] {
       display: none !important;
