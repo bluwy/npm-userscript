@@ -31,10 +31,10 @@ export async function run() {
     // without fetching the list of files directly (which can be a bit expensive). So we just
     // don't show that it has no types for now.
   } else if (typesInfo.type === 'bundled') {
-    const label = addPackageLabel('DTS', 'info')
+    const label = addPackageLabel('show-types-label', 'DTS')
     label.title = 'This package ships TypeScript types'
   } else if (typesInfo.type === 'package') {
-    const label = addPackageLabel(`DTS: ${typesInfo.packageName}`, 'info')
+    const label = addPackageLabel('show-types-label', `DTS: ${typesInfo.packageName}`)
     label.title = `This package relies on ${typesInfo.packageName} for TypeScript types`
   } else {
     console.warn('[npm-userscript:show-types-label] unable to determine types info')
