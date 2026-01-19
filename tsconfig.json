@@ -1,12 +1,8 @@
 {
-  "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "types": ["node", "greasemonkey"],
-    "alwaysStrict": false,
-    "noEmit": true,
-    "strict": true
-  }
+  "references": [
+    { "path": "./scripts" },
+    { "path": "./src" },
+    { "path": "./worker" },
+  ],
+  "files": []
 }
