@@ -17,7 +17,7 @@ export async function run() {
   const packageName = getPackageName()
   if (!packageName) return
   if (packageName.startsWith('create-') || /^@.+\/create-/.test(packageName)) {
-    const label = addPackageLabel('show-cli-label', 'CLI')
+    const label = addPackageLabel('show-cli-label-and-command', 'CLI')
     label.title = 'This package is a template CLI'
     updateCodeBlock(`npm create ${packageName.slice('create-'.length)}@latest`)
     return
@@ -29,7 +29,7 @@ export async function run() {
   const binNames = getBinNames(packageJson.bin, packageName)
   if (binNames.length === 0) return
 
-  const label = addPackageLabel('show-cli-label', 'CLI')
+  const label = addPackageLabel('show-cli-label-and-command', 'CLI')
   label.title = `This package ships the ${binNames.map((n) => `"${n}"`).join(', ')} command`
   updateCodeBlock(`npx ${packageName}`)
 }

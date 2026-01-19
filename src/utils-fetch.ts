@@ -28,6 +28,15 @@ export async function fetchPackageFilesData(): Promise<PackageFilesData | undefi
     fetchJson(`https://www.npmjs.com/package/${packageName}/v/${packageVersion}/index`),
   )
 }
+export async function fetchPackageFileContent(hex: string): Promise<string | undefined> {
+  const packageName = getPackageName()
+  if (!packageName) return undefined
+  // https://www.npmjs.com/package/vite/file/223635a2336dd42ac73ec67bbea116086875f640bc28fceb8846c572a496d673
+  // This uses the same data from the code tab
+  return inMemoryCache(`fetchPackageFiles:${packageName}-${hex}`, () =>
+    fetchJson(`https://www.npmjs.com/package/${packageName}/file/${hex}`),
+  )
+}
 
 export async function fetchPackageJson(): Promise<Record<string, any> | undefined> {
   const packageName = getPackageName()

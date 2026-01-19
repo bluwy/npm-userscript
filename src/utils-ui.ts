@@ -13,7 +13,7 @@ export function addPackageLabelStyle() {
       font-weight: bold;
       border-style: solid;
       border-width: 1px;
-      margin-left: 12px;
+      margin-left: 8px;
       gap: 3px;
       align-items: center;
       padding: 2px 4px;
@@ -41,8 +41,9 @@ export function addPackageLabelStyle() {
 }
 
 const PACKAGE_LABEL_ORDER = [
+  'show-file-types-label',
   'show-types-label',
-  'show-cli-label',
+  'show-cli-label-and-command',
   'show-binary-label',
   'show-engine-label',
   'module-replacements',
