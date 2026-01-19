@@ -1,22 +1,31 @@
 import { fromVector } from 'ae-cvss-calculator'
 import type { RouteHandler } from '../types.ts'
 
-export const handler: RouteHandler = async (request) => {
+const CACHE_TTL = 5 * 60 // 5 minutes
+
+export const handler: RouteHandler = async (request, env, ctx) => {
   const url = new URL(request.url)
   const match = url.pathname.match(/^\/vulnerabilities\/([^/]+)$/)
   if (!match) return
 
   const packageName = match[1]
-  const osvUrl = 'https://api.osv.dev/v1/query'
-  const body = JSON.stringify({
-    package: {
-      name: packageName,
-      ecosystem: 'npm',
-    },
-  })
-  const result = await fetch(osvUrl, {
+  // NOTE: Don't allow queries to bust the cache
+  const cacheKey = `${url.origin}${url.pathname}`
+  const cache = caches.default
+
+  let cachedResponse = await cache.match(cacheKey)
+  if (cachedResponse) {
+    return cachedResponse
+  }
+
+  const result = await fetch('https://api.osv.dev/v1/query', {
     method: 'POST',
-    body,
+    body: JSON.stringify({
+      package: {
+        name: packageName,
+        ecosystem: 'npm',
+      },
+    }),
   })
   const json: any = await result.json()
 
@@ -53,5 +62,13 @@ export const handler: RouteHandler = async (request) => {
     return new Response('Error processing data', { status: 500 })
   }
 
-  return Response.json(filtered)
+  const response = Response.json(filtered, {
+    headers: {
+      'Cache-Control': `public, max-age=${CACHE_TTL}`,
+    },
+  })
+
+  ctx.waitUntil(cache.put(cacheKey, response.clone()))
+
+  return response
 }
