@@ -20,7 +20,7 @@ export async function run() {
   if (!packageJson) return
 
   if (shipsNativeBinaries(packageJson)) {
-    const label = addPackageLabel('show-binary-label', 'ships binaries')
+    const label = addPackageLabel('show-binary-label', 'Has binaries')
     label.title = 'This package ships prebuilt native binaries via optional dependencies'
     return
   }

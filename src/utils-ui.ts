@@ -46,6 +46,7 @@ const PACKAGE_LABEL_ORDER = [
   'show-cli-label-and-command',
   'show-binary-label',
   'show-engine-label',
+  'show-lifecycle-scripts-label',
   'module-replacements',
 ] as const
 
