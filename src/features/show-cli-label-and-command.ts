@@ -31,7 +31,10 @@ export async function run() {
 
   const label = addPackageLabel('show-cli-label-and-command', 'CLI')
   label.title = `This package ships the ${binNames.map((n) => `"${n}"`).join(', ')} command`
-  updateCodeBlock(`npx ${packageName}`)
+
+  if (!packageJson.main && !packageJson.exports && !packageJson.browser && !packageJson.module) {
+    updateCodeBlock(`npx ${packageName}`)
+  }
 }
 
 function getBinNames(binField: any, packageName: string): string[] {
