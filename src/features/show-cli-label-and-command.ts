@@ -3,7 +3,8 @@ import { addPackageLabel, addPackageLabelStyle } from '../utils-ui.ts'
 import { getPackageName, isValidPackagePage } from '../utils.ts'
 
 export const description = `\
-Adds a label if the package ships a CLI via the package.json "bin" field.
+Adds a label if the package ships a CLI via the package.json "bin" field, and update the install
+command to "npm create" or "npx" accordingly.
 `
 
 export function runPre() {
@@ -18,6 +19,7 @@ export async function run() {
   if (packageName.startsWith('create-') || /^@.+\/create-/.test(packageName)) {
     const label = addPackageLabel('show-cli-label', 'CLI')
     label.title = 'This package is a template CLI'
+    updateCodeBlock(`npm create ${packageName.slice('create-'.length)}@latest`)
     return
   }
 
@@ -29,6 +31,7 @@ export async function run() {
 
   const label = addPackageLabel('show-cli-label', 'CLI')
   label.title = `This package ships the ${binNames.map((n) => `"${n}"`).join(', ')} command`
+  updateCodeBlock(`npx ${packageName}`)
 }
 
 function getBinNames(binField: any, packageName: string): string[] {
@@ -39,4 +42,12 @@ function getBinNames(binField: any, packageName: string): string[] {
   } else {
     return []
   }
+}
+
+function updateCodeBlock(command: string) {
+  const codeBlock = document.querySelector('[aria-label="Package sidebar"] code')
+  if (!codeBlock) return
+
+  codeBlock.textContent = command
+  // NOTE: The copy button automatically picks up this change, so no handling needed for it
 }
