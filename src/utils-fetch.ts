@@ -1,6 +1,34 @@
 import { inMemoryCache } from './utils-cache.ts'
 import { getPackageName, getPackageVersion } from './utils.ts'
 
+export interface PackageFilesData {
+  totalSize: number
+  fileCount: number
+  files: Record<string, PackageFilesDataFile>
+  integrity: string
+  shasum: string
+}
+
+export interface PackageFilesDataFile {
+  type: 'File'
+  contentType: string
+  path: string
+  size: number
+  linesCount: number
+  hex: string
+  isBinary: string // "true" | "false" (amazing npm)
+}
+
+export async function fetchPackageFilesData(): Promise<PackageFilesData | undefined> {
+  const packageName = getPackageName()
+  const packageVersion = getPackageVersion()
+  if (!packageName || !packageVersion) return undefined
+  // This uses the same data from the code tab
+  return inMemoryCache(`fetchPackageFiles:${packageName}@${packageVersion}`, () =>
+    fetchJson(`https://www.npmjs.com/package/${packageName}/v/${packageVersion}/index`),
+  )
+}
+
 export async function fetchPackageJson(): Promise<Record<string, any> | undefined> {
   const packageName = getPackageName()
   const packageVersion = getPackageVersion()

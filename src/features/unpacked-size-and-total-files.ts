@@ -1,5 +1,5 @@
-import { fetchJson } from '../utils-fetch.ts'
-import { getPackageName, getPackageVersion, isValidPackagePage, prettyBytes } from '../utils.ts'
+import { fetchPackageFilesData } from '../utils-fetch.ts'
+import { isValidPackagePage, prettyBytes } from '../utils.ts'
 
 export const description = `\
 Display the "Unpacked Size" and "Total Files" columns for older packages that lack the data.
@@ -9,10 +9,6 @@ Display the "Unpacked Size" and "Total Files" columns for older packages that la
 
 export async function run() {
   if (!isValidPackagePage()) return
-
-  const packageName = getPackageName()
-  const packageVersion = getPackageVersion()
-  if (!packageName || !packageVersion) return
 
   const sidebarColumns = document.querySelectorAll('[aria-label="Package sidebar"] > div:has(> h3)')
   const licenseColumn = Array.from(sidebarColumns).find(
@@ -28,30 +24,20 @@ export async function run() {
   )
   if (unpackedSizeColumn && totalFilesColumn) return
 
-  const data = await getData(packageName, packageVersion)
+  const data = await fetchPackageFilesData()
+  if (!data) return
 
   if (!totalFilesColumn) {
     const newTotalFilesColumn = licenseColumn.cloneNode(true) as HTMLElement
     newTotalFilesColumn.querySelector('h3')!.textContent = 'Total Files'
-    newTotalFilesColumn.querySelector('p')!.textContent = data.totalFiles.toString()
+    newTotalFilesColumn.querySelector('p')!.textContent = data.fileCount.toString()
     licenseColumn.insertAdjacentElement('afterend', newTotalFilesColumn)
   }
 
   if (!unpackedSizeColumn) {
     const newUnpackedSizeColumn = licenseColumn.cloneNode(true) as HTMLElement
     newUnpackedSizeColumn.querySelector('h3')!.textContent = 'Unpacked Size'
-    newUnpackedSizeColumn.querySelector('p')!.textContent = prettyBytes(data.unpackedSize)
+    newUnpackedSizeColumn.querySelector('p')!.textContent = prettyBytes(data.totalSize)
     licenseColumn.insertAdjacentElement('afterend', newUnpackedSizeColumn)
-  }
-}
-
-async function getData(packageName: string, packageVersion: string) {
-  // This uses the same data from the code tab
-  const data = await fetchJson(
-    `https://www.npmjs.com/package/${packageName}/v/${packageVersion}/index`,
-  )
-  return {
-    unpackedSize: data.totalSize,
-    totalFiles: data.fileCount,
   }
 }

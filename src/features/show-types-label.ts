@@ -1,12 +1,12 @@
+import { fetchPackageFilesData, fetchPackageJson } from '../utils-fetch.ts'
 import { addPackageLabel, addPackageLabelStyle } from '../utils-ui.ts'
-import { addStyle, getNpmContext, isValidPackagePage } from '../utils.ts'
+import { addStyle, getNpmContext, getPackageName, isValidPackagePage } from '../utils.ts'
 
 export const description = `\
 Adds a label for packages that ship types. This is similar to npm's own DT / TS icon but
-with a more consistent UI.
+with a more consistent UI. It is also more accurate if the package ship types but isn't detectable
+in the package.json.
 `
-
-export const disabled = true
 
 export function runPre() {
   addPackageLabelStyle()
@@ -17,15 +17,51 @@ export function runPre() {
   `)
 }
 
-export function run() {
+export async function run() {
   if (!isValidPackagePage()) return
 
+  const packageName = getPackageName()
+  if (!packageName) return
+  if (packageName.startsWith('create-') || /^@.+\/create-/.test(packageName)) {
+    // We don't really care about types for template CLIs
+  }
+
   const typesInfo = parseNpmTypes()
+
   if (typesInfo.type === 'none') {
-    // Right now the detection isn't perfect as some packages may only specify `.js` in the
-    // package.json and rely on the adjacent `.d.ts` files for types, which is hard to detect
-    // without fetching the list of files directly (which can be a bit expensive). So we just
-    // don't show that it has no types for now.
+    // Npm might not detect this correctly. We check from its shipped files instead.
+    const data = await fetchPackageFilesData()
+    if (
+      Object.keys(data?.files ?? {}).some(
+        (p) => p.endsWith('.d.ts') || p.endsWith('.d.mts') || p.endsWith('.d.cts'),
+      )
+    ) {
+      typesInfo.type = 'bundled'
+    }
+    // Additionally, maybe this package intentionally does not have types because it's not
+    // shipping any JS files
+    else {
+      // Check the main and exports field recursively for values that end with .js, .mjs, and .cjs
+      const packageJson = await fetchPackageJson()
+      function hasJsFiles(value: any): boolean {
+        if (typeof value === 'string') {
+          return value.endsWith('.js') || value.endsWith('.mjs') || value.endsWith('.cjs')
+        } else if (Array.isArray(value)) {
+          return value.some(hasJsFiles)
+        } else if (typeof value === 'object' && value !== null) {
+          return Object.values(value).some(hasJsFiles)
+        }
+        return false
+      }
+      if (!hasJsFiles(packageJson?.main) && !hasJsFiles(packageJson?.exports)) {
+        return
+      }
+    }
+  }
+
+  if (typesInfo.type === 'none') {
+    const label = addPackageLabel('show-types-label', 'Untyped', 'warning')
+    label.title = 'This package does not ship TypeScript types'
   } else if (typesInfo.type === 'bundled') {
     const label = addPackageLabel('show-types-label', 'DTS')
     label.title = 'This package ships TypeScript types'
