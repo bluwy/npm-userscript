@@ -40,22 +40,23 @@ export function addPackageLabelStyle() {
   `)
 }
 
-const PACKAGE_LABEL_ORDER = {
-  'show-types-label': 10,
-  'show-engine-label': 20,
-  'show-binary-label': 30,
-  'module-replacements': 40,
-} as const
+const PACKAGE_LABEL_ORDER = [
+  'show-types-label',
+  'show-cli-label',
+  'show-binary-label',
+  'show-engine-label',
+  'module-replacements',
+] as const
 
 const insertedLabels: HTMLElement[] = []
 
 export function addPackageLabel(
-  orderKey: keyof typeof PACKAGE_LABEL_ORDER,
+  orderKey: (typeof PACKAGE_LABEL_ORDER)[number],
   innerHtml: string,
   type: 'info' | 'warning' | 'error' = 'info',
   el: 'span' | 'button' = 'span',
 ): HTMLElement {
-  const order = PACKAGE_LABEL_ORDER[orderKey]
+  const order = PACKAGE_LABEL_ORDER.indexOf(orderKey)
   const titleEl = document.querySelector('#top h1')
   if (!titleEl) throw new Error('Could not find package title element')
 
