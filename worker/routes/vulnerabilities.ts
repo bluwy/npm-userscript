@@ -42,15 +42,21 @@ export const handler: RouteHandler = async (request, env, ctx) => {
           const cvss = fromVector(cvssVector)
           const score = cvss.calculateScores().overall
 
+          // Try to get the CVE- prefix name if possible
+          const id = vuln.aliases.find((a: string) => a.startsWith('CVE-')) ?? vuln.id
+          // Try to get the link that contains the id first, then the specific ADVISORY type, else the first
           const link = (
-            vuln.references.find((ref: any) => ref.type === 'ADVISORY') ?? vuln.references[0]
+            vuln.references.find((ref: any) => ref.url.includes(id)) ??
+            vuln.references.find((ref: any) => ref.type === 'ADVISORY') ??
+            vuln.references[0]
           ).url
 
           return {
-            id: vuln.id,
+            id,
             link,
             score,
             affected: vuln.affected.flatMap((aff: any) => {
+              if (aff.package.name !== packageName) return []
               const arr = []
               for (const range of aff.ranges) {
                 if (range.type === 'SEMVER') {
@@ -75,6 +81,7 @@ export const handler: RouteHandler = async (request, env, ctx) => {
   const response = Response.json(filtered, {
     headers: {
       'Cache-Control': `public, max-age=${CACHE_TTL}`,
+      'Access-Control-Allow-Origin': 'https://www.npmjs.com',
     },
   })
 

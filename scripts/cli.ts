@@ -16,14 +16,16 @@ await build({
       'api.github.com',
       'cdn.jsdelivr.net',
       'registry.npmjs.org',
-      isDev ? 'localhost:8787' : '',
+      isDev ? 'localhost:8787' : 'npm-userscript.bjornlu.workers.dev',
     ],
     'inject-into': 'content', // run in isolated context
     'run-at': 'document-start',
   },
   esbuildOptions: {
     define: {
-      API_URL: JSON.stringify(isDev ? 'http://localhost:8787' : ''),
+      API_URL: JSON.stringify(
+        isDev ? 'http://localhost:8787' : 'https://npm-userscript.bjornlu.workers.dev',
+      ),
     },
   },
 })
