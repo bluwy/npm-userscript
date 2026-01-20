@@ -1,7 +1,8 @@
 import { fromVector } from 'ae-cvss-calculator'
 import type { RouteHandler } from '../types.ts'
 
-const CACHE_TTL = 5 * 60 // 5 minutes
+// The osv.dev API seems to update around every 15 minutes, so we also cache for that duration
+const CACHE_TTL = 15 * 60
 
 export const handler: RouteHandler = async (request, env, ctx) => {
   const url = new URL(request.url)
@@ -30,36 +31,40 @@ export const handler: RouteHandler = async (request, env, ctx) => {
   const json: any = await result.json()
 
   let filtered: any
-  try {
-    filtered = {
-      vulns: json.vulns.map((vuln: any) => {
-        const cvssVector = vuln.severity[0].score
-        const cvss = fromVector(cvssVector)
-        const score = cvss.calculateScores().overall
+  if (!json.vulns || json.vulns.length === 0) {
+    filtered = { vulns: [] }
+  } else {
+    try {
+      filtered = {
+        vulns: json.vulns.map((vuln: any) => {
+          const cvssVector = vuln.severity[0].score
+          const cvss = fromVector(cvssVector)
+          const score = cvss.calculateScores().overall
 
-        return {
-          id: vuln.id,
-          link: vuln.references.find((ref: any) => ref.type === 'ADVISORY').url,
-          score,
-          affected: vuln.affected.flatMap((aff: any) => {
-            const arr = []
-            for (const range of aff.ranges) {
-              if (range.type === 'SEMVER') {
-                const introduced = range.events.find((e: any) => e.introduced)?.introduced
-                const fixed = range.events.find((e: any) => e.fixed)?.fixed
-                if (introduced && fixed) {
-                  arr.push([introduced, fixed])
+          return {
+            id: vuln.id,
+            link: vuln.references.find((ref: any) => ref.type === 'ADVISORY').url,
+            score,
+            affected: vuln.affected.flatMap((aff: any) => {
+              const arr = []
+              for (const range of aff.ranges) {
+                if (range.type === 'SEMVER') {
+                  const introduced = range.events.find((e: any) => e.introduced)?.introduced
+                  const fixed = range.events.find((e: any) => e.fixed)?.fixed
+                  if (introduced && fixed) {
+                    arr.push([introduced, fixed])
+                  }
                 }
               }
-            }
-            return arr
-          }),
-        }
-      }),
+              return arr
+            }),
+          }
+        }),
+      }
+    } catch (e) {
+      // console.error('Error processing data', e, json)
+      return new Response('Error processing data', { status: 500 })
     }
-  } catch (e) {
-    // console.error('Error processing data', e)
-    return new Response('Error processing data', { status: 500 })
   }
 
   const response = Response.json(filtered, {
