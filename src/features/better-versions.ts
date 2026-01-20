@@ -1,4 +1,4 @@
-import { addStyle, isValidPackagePage, listenNavigate } from '../utils.ts'
+import { addStyle, getNpmContext, isValidPackagePage, listenNavigate } from '../utils.ts'
 
 export const description = `\
 Improved package versions tab with compact table view, cumulated versions table, show tags next to
@@ -141,18 +141,14 @@ function addCumulatedVersionsTable() {
 
   const majorToInfo: Record<string, VersionInfo> = {}
   const minorToInfo: Record<string, VersionInfo> = {}
-  versionHistoryTable.querySelectorAll('tbody tr').forEach((row) => {
-    const versionLink = row.querySelector('td a')
-    if (!versionLink) return
-    const version = versionLink.textContent || ''
+  const npmContext = getNpmContext()
+
+  for (const entry of npmContext.context.packument.versions) {
+    const version = entry.version
     const major = version.split('.')[0]
     const minor = version.split('.').slice(0, 2).join('.')
-    const downloadsTd = row.querySelector('td:nth-child(2)')
-    const publishedTd = row.querySelector('td:nth-child(3)')
-    if (!downloadsTd || !publishedTd) return
-    const downloadsText = downloadsTd.textContent || '0'
-    const downloads = parseInt(downloadsText.replace(/,|\.|\s/g, ''), 10) || 0
-    const publishedText = publishedTd.textContent || ''
+    const downloads = npmContext.context.versionsDownloads[version] || 0
+    const publishedText = entry.date.rel
 
     if (!majorToInfo[major]) {
       majorToInfo[major] = {
@@ -169,7 +165,7 @@ function addCumulatedVersionsTable() {
       }
     }
     minorToInfo[minor].totalDownloads += downloads
-  })
+  }
 
   // Clear existing rows and add our own rows
   newBody.remove()
