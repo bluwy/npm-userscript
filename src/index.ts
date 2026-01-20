@@ -1,5 +1,5 @@
 import { allFeatures } from './all-features.ts'
-import { featureSettings, injectSettingsTrigger } from './settings.ts'
+import { clearOutdatedSettings, featureSettings, injectSettingsTrigger } from './settings.ts'
 import { cache } from './utils-cache.ts'
 import { consolidateStyles, ensureSidebarBalance, waitForPageReady } from './utils.ts'
 
@@ -43,4 +43,5 @@ async function runFeatures() {
   cache.clearExpired()
   ensureSidebarBalance()
   injectSettingsTrigger()
+  clearOutdatedSettings()
 }

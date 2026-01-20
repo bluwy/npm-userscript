@@ -163,3 +163,15 @@ export function injectSettingsTrigger() {
   const sidebar = document.querySelector('[aria-label="Package sidebar"]')
   sidebar?.insertAdjacentElement('beforeend', button)
 }
+
+export function clearOutdatedSettings() {
+  const keys = Object.keys(localStorage)
+  for (const key of keys) {
+    if (key.startsWith('npm-userscript:settings:feature:')) {
+      const featureName = key.slice('npm-userscript:settings:feature:'.length)
+      if (!(featureName in allFeatures)) {
+        localStorage.removeItem(key)
+      }
+    }
+  }
+}
