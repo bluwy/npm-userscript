@@ -2,16 +2,16 @@ import semverGte from 'semver/functions/gte.js'
 import semverLt from 'semver/functions/lt.js'
 import semverMaxSatisfying from 'semver/ranges/max-satisfying.js'
 import { fetchJson } from '../utils-fetch.ts'
+import { listenNavigate } from '../utils-navigation.ts'
+import { getNpmContext } from '../utils-npm-context.ts'
+import { addPackageLabel, addPackageLabelStyle, computeFloatingUI } from '../utils-ui.ts'
 import {
   addStyle,
-  getNpmContext,
   getPackageName,
   getPackageVersion,
   isValidPackagePage,
-  listenNavigate,
   waitForElement,
 } from '../utils.ts'
-import { addPackageLabel, addPackageLabelStyle, computeFloatingUI } from '../utils-ui.ts'
 
 export const description = `\
 Adds a label if a package is vulnerable in the header and versions table.

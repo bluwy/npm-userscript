@@ -1,5 +1,6 @@
 import { fetchPackageJson } from '../utils-fetch.ts'
-import { addStyle, isValidPackagePage, listenNavigate } from '../utils.ts'
+import { listenNavigate } from '../utils-navigation.ts'
+import { addStyle, isValidPackagePage } from '../utils.ts'
 
 export const description = `\
 Improved package dependencies tab with added peer dependencies info, optional dependencies info,

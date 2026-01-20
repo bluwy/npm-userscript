@@ -1,7 +1,9 @@
 import { allFeatures } from './all-features.ts'
 import { clearOutdatedSettings, featureSettings, injectSettingsTrigger } from './settings.ts'
 import { cache } from './utils-cache.ts'
-import { consolidateStyles, ensureSidebarBalance, waitForPageReady } from './utils.ts'
+import { waitForPageReady } from './utils-navigation.ts'
+import { extractNpmContext } from './utils-npm-context.ts'
+import { consolidateStyles, ensureSidebarBalance } from './utils.ts'
 
 // esbuild define
 declare global {
@@ -27,6 +29,7 @@ async function runFeatures() {
 
   // Let npm's JS run a bit before we run our main features
   await waitForPageReady()
+  await extractNpmContext()
 
   // Run normal
   for (const feature in allFeatures) {

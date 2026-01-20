@@ -1,4 +1,4 @@
-const HYDRATION_DELAY_MS = 50
+import { getNpmContext } from './utils-npm-context.ts'
 
 const styles: string[] = []
 
@@ -13,28 +13,24 @@ export function consolidateStyles() {
   styles.length = 0
 }
 
-export async function waitForPageReady(): Promise<void> {
-  await new Promise<void>((resolve) => {
-    if (document.readyState === 'complete' || document.readyState === 'interactive') {
-      resolve()
-    } else {
-      listenOnce('DOMContentLoaded', () => resolve())
-    }
+export async function waitForElement(selector: string, timeout = 1000): Promise<void> {
+  if (document.querySelector(selector)) return
+
+  return new Promise<void>((resolve, reject) => {
+    const timeoutTimer = setTimeout(() => {
+      clearInterval(queryTimer)
+      clearInterval(timeoutTimer)
+      reject(new Error(`Timeout waiting for element: ${selector}`))
+    }, timeout)
+
+    const queryTimer = setInterval(() => {
+      if (document.querySelector(selector)) {
+        clearInterval(queryTimer)
+        clearTimeout(timeoutTimer)
+        resolve()
+      }
+    }, 100)
   })
-  await extractNpmContext()
-  // Additionally, wait for npm to hydrate
-  await new Promise((resolve) => setTimeout(resolve, HYDRATION_DELAY_MS))
-}
-
-export async function waitForElement(selector: string): Promise<void> {
-  //
-}
-
-export function listenOnce<K extends keyof DocumentEventMap>(
-  type: K,
-  listener: (this: Document, ev: DocumentEventMap[K]) => any,
-) {
-  document.addEventListener(type, listener, { once: true })
 }
 
 export function getPackageName(): string | undefined {
@@ -89,29 +85,6 @@ export function prettyBytes(bytes: number): string {
   return `${num} ${unit}`
 }
 
-const onNavigateListeners: Function[] = []
-export function listenNavigate(listener: () => void) {
-  let lastHref = location.href
-
-  if (onNavigateListeners.length === 0) {
-    // Because we're using `inject-into: content`, we can't detect the page has navigated via
-    // history api. We need to do some lame detection.
-    document.addEventListener('click', () => {
-      setTimeout(() => {
-        if (location.href !== lastHref) {
-          lastHref = location.href
-          onNavigateListeners.forEach((l) => l())
-        }
-      }, 100)
-    })
-  }
-
-  onNavigateListeners.push(() => {
-    // Delay to allow npm to render the new content. Sucks to hardcode but couldn't find a better way.
-    setTimeout(() => listener(), HYDRATION_DELAY_MS)
-  })
-}
-
 /**
  * The sidebar has two-column layout that may have a row only with one column when we inject
  * additional data, which causes the separator to be halved. This function with fix that by
@@ -125,41 +98,4 @@ export function ensureSidebarBalance() {
     const lastColumn = halfWidthColumns[halfWidthColumns.length - 1]
     lastColumn.classList.add('w-100')
   }
-}
-
-let _npmContext: any = null
-
-/**
- * Get the `window.__context__` object from the npm page
- */
-export function getNpmContext() {
-  if (_npmContext == null) {
-    throw new Error('Npm context not yet extracted')
-  }
-  return _npmContext
-}
-
-// In many userscripts we can't rely on `unsafeWindow` to access page variables, so we need to do
-// this trick to extract the stuff we need.
-async function extractNpmContext() {
-  return new Promise<void>((resolve) => {
-    const elementId = 'npm-userscript-context'
-    const elementEvent = 'npm-userscript-done'
-    const script = document.createElement('script')
-    script.id = elementId
-    script.textContent = `
-      document.getElementById('${elementId}').dataset.value = JSON.stringify(window.__context__)
-      document.getElementById('${elementId}').dispatchEvent(new Event('${elementEvent}'))
-    `
-    script.addEventListener(
-      elementEvent,
-      () => {
-        _npmContext = JSON.parse(script.dataset.value || '{}')
-        script.remove()
-        resolve()
-      },
-      { once: true },
-    )
-    document.body.appendChild(script)
-  })
 }

@@ -1,4 +1,6 @@
-import { addStyle, getNpmContext, isValidPackagePage, listenNavigate } from '../utils.ts'
+import { listenNavigate } from '../utils-navigation.ts'
+import { getNpmContext } from '../utils-npm-context.ts'
+import { addStyle, isValidPackagePage } from '../utils.ts'
 
 export const description = `\
 Improved package versions tab with compact table view, cumulated versions table, show tags next to

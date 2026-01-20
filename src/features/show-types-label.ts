@@ -1,6 +1,7 @@
 import { fetchPackageFilesData, fetchPackageJson } from '../utils-fetch.ts'
+import { getNpmContext } from '../utils-npm-context.ts'
 import { addPackageLabel, addPackageLabelStyle } from '../utils-ui.ts'
-import { addStyle, getNpmContext, getPackageName, isValidPackagePage } from '../utils.ts'
+import { addStyle, getPackageName, isValidPackagePage } from '../utils.ts'
 
 export const description = `\
 Adds a label for packages that ship types. This is similar to npm's own DT / TS icon but
