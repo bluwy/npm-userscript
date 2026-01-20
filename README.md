@@ -29,6 +29,7 @@ Various improvements and fixes for npmjs.com.
 | `show-file-types-label`         | Show ESM or CJS labels if the package ships them.                                                                                                                                                                |
 | `show-lifecycle-scripts-label`  | Adds a label if the package defines lifecycle scripts in its package.json.                                                                                                                                       |
 | `show-types-label`              | Adds a label for packages that ship types. This is similar to npm's own DT / TS icon but with a more consistent UI. It is also more accurate if the package ship types but isn't detectable in the package.json. |
+| `show-vulnerabilities`          | Adds a label if a package is vulnerable in the header and versions table.                                                                                                                                        |
 | `tarball-size`                  | Display the tarball size of the package.                                                                                                                                                                         |
 | `unpacked-size-and-total-files` | Display the "Unpacked Size" and "Total Files" columns for older packages that lack the data.                                                                                                                     |
 

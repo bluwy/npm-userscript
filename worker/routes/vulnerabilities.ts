@@ -6,7 +6,8 @@ const CACHE_TTL = 15 * 60
 
 export const handler: RouteHandler = async (request, env, ctx) => {
   const url = new URL(request.url)
-  const match = url.pathname.match(/^\/vulnerabilities\/([^/]+)$/)
+  // Accept /vulnerabilities/foo or /vulnerabilities/@foo/bar
+  const match = url.pathname.match(/^\/vulnerabilities\/(.+)$/)
   if (!match) return
 
   const packageName = match[1]
@@ -41,9 +42,13 @@ export const handler: RouteHandler = async (request, env, ctx) => {
           const cvss = fromVector(cvssVector)
           const score = cvss.calculateScores().overall
 
+          const link = (
+            vuln.references.find((ref: any) => ref.type === 'ADVISORY') ?? vuln.references[0]
+          ).url
+
           return {
             id: vuln.id,
-            link: vuln.references.find((ref: any) => ref.type === 'ADVISORY').url,
+            link,
             score,
             affected: vuln.affected.flatMap((aff: any) => {
               const arr = []

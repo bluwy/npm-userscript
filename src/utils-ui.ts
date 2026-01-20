@@ -41,6 +41,7 @@ export function addPackageLabelStyle() {
 }
 
 const PACKAGE_LABEL_ORDER = [
+  'show-vulnerabilities',
   'show-file-types-label',
   'show-types-label',
   'show-cli-label-and-command',
@@ -141,4 +142,6 @@ export function computeFloatingUI(
       close()
     }
   })
+  // also close the popup on mouseleave
+  floating.addEventListener('mouseleave', close)
 }

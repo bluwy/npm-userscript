@@ -3,6 +3,11 @@ import { featureSettings, injectSettingsTrigger } from './settings.ts'
 import { cache } from './utils-cache.ts'
 import { consolidateStyles, ensureSidebarBalance, waitForPageReady } from './utils.ts'
 
+// esbuild define
+declare global {
+  const API_URL: string
+}
+
 runFeatures()
 
 async function runFeatures() {

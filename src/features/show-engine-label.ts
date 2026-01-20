@@ -25,7 +25,7 @@ export async function run() {
     label.title = `This package requires Node.js ${engines.node}`
   }
 
-  // NOTE: Maybe support more engines in the future, but at the moment Node.js seems to eb the only
+  // NOTE: Maybe support more engines in the future, but at the moment Node.js seems to be the only
   // widely used one. npm/pnpm versions isn't very useful I think, and there's not much usage for
   // deno/bun either.
 }

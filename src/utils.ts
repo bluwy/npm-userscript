@@ -26,6 +26,10 @@ export async function waitForPageReady(): Promise<void> {
   await new Promise((resolve) => setTimeout(resolve, HYDRATION_DELAY_MS))
 }
 
+export async function waitForElement(selector: string): Promise<void> {
+  //
+}
+
 export function listenOnce<K extends keyof DocumentEventMap>(
   type: K,
   listener: (this: Document, ev: DocumentEventMap[K]) => any,
