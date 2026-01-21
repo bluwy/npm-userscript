@@ -11,11 +11,25 @@ declare global {
 }
 
 listenNpmContext()
-runFeatures().then(() => runNotImportantStuff())
-listenNavigate(async (previousUrl) => {
-  const promises: Promise<void>[] = []
 
-  // Run teardown
+let sequencePromise = runFeatures().then(() => runNotImportantStuff())
+let teardownQueue = 0
+
+listenNavigate(async (previousUrl) => {
+  teardownQueue++
+
+  sequencePromise = sequencePromise.then(async () => {
+    await runTeardown(previousUrl)
+    // If a new navigation happened at this point, don't run the features, run the next teardown again
+    if (teardownQueue-- > 1) return
+    await runFeatures()
+    // Reset the promise chain if there's no more teardowns queued to avoid long chains
+    if (teardownQueue === 0) sequencePromise = Promise.resolve()
+  })
+})
+
+async function runTeardown(previousUrl: string) {
+  const promises: Promise<void>[] = []
   for (const feature in allFeatures) {
     if (featureSettings[feature].get() === false) continue
     const promise = allFeatures[feature].teardown?.(previousUrl)?.catch((err) => {
@@ -26,9 +40,7 @@ listenNavigate(async (previousUrl) => {
   await Promise.all(promises)
 
   teardownSidebarBalance()
-
-  await runFeatures()
-})
+}
 
 async function runFeatures() {
   const promises: Promise<void>[] = []
