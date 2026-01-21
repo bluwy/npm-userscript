@@ -16,7 +16,7 @@ await build({
       'api.github.com',
       'cdn.jsdelivr.net',
       'registry.npmjs.org',
-      isDev ? 'localhost:8787' : 'npm-userscript.bjornlu.workers.dev',
+      isDev ? 'localhost' : 'npm-userscript.bjornlu.workers.dev',
     ],
     'inject-into': 'content', // run in isolated context
     'run-at': 'document-start',
