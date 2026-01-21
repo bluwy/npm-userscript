@@ -1,6 +1,12 @@
 import { fetchPackageJson } from '../utils-fetch.ts'
+import { getNpmContext } from '../utils-npm-context.ts'
 import { addPackageLabel, addPackageLabelStyle } from '../utils-ui.ts'
-import { getPackageName, isSamePackagePage, isValidPackagePage } from '../utils.ts'
+import {
+  getPackageName,
+  getPackageVersion,
+  isSamePackagePage,
+  isValidPackagePage,
+} from '../utils.ts'
 
 export const description = `\
 Adds a label if the package ships a CLI via the package.json "bin" field, and update the install
@@ -23,12 +29,17 @@ export async function run() {
   if (document.querySelector('.npm-userscript-types-label')) return
 
   const packageName = getPackageName()
-  if (!packageName) return
+  const packageVersion = getPackageVersion()
+  if (!packageName || !packageVersion) return
+
+  const isLatest = getNpmContext().context.packument.distTags.latest === packageVersion
+
   if (packageName.startsWith('create-') || /^@.+\/create-/.test(packageName)) {
     const label = addPackageLabel('show-cli-label-and-command', 'CLI')
     label.classList.add('npm-userscript-types-label')
     label.title = 'This package is a template CLI'
-    updateCodeBlock(`npm create ${packageName.slice('create-'.length)}@latest`)
+    const atVersion = isLatest ? '@latest' : `@${packageVersion}`
+    updateCodeBlock(`npm create ${packageName.slice('create-'.length)}${atVersion}`)
     return
   }
 
@@ -43,7 +54,8 @@ export async function run() {
   label.title = `This package ships the ${binNames.map((n) => `"${n}"`).join(', ')} command`
 
   if (!packageJson.main && !packageJson.exports && !packageJson.browser && !packageJson.module) {
-    updateCodeBlock(`npx ${packageName}`)
+    const atVersion = isLatest ? '' : `@${packageVersion}`
+    updateCodeBlock(`npx ${packageName}${atVersion}`)
   }
 }
 
