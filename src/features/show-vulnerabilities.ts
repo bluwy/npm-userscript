@@ -188,6 +188,7 @@ function getVulnerabilitiesForVersion(
     for (const affected of vuln.affected) {
       if (semverGte(version, affected[0]) && semverLt(version, affected[1])) {
         matched.push(vuln)
+        break
       }
     }
   }
