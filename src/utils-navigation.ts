@@ -16,25 +16,45 @@ export async function waitForPageReady(): Promise<void> {
   pageAlreadyReady = true
 }
 
-const onNavigateListeners: Function[] = []
-export function listenNavigate(listener: () => void) {
+export type NavigateListener = (previousUrl: string) => void
+
+const onNavigateListeners: NavigateListener[] = []
+
+function listenNavigateCode() {
+  const pushState = history.pushState
+  history.pushState = function () {
+    // @ts-expect-error
+    pushState.apply(this, arguments)
+    window.dispatchEvent(new Event('npm-userscript-navigate'))
+  }
+  const replaceState = history.replaceState
+  history.replaceState = function () {
+    // @ts-expect-error
+    replaceState.apply(this, arguments)
+    window.dispatchEvent(new Event('npm-userscript-navigate'))
+  }
+  window.addEventListener('popstate', function () {
+    window.dispatchEvent(new Event('npm-userscript-navigate'))
+  })
+}
+
+export function listenNavigate(listener: NavigateListener) {
   let lastHref = location.href
 
   if (onNavigateListeners.length === 0) {
-    // Because we're using `inject-into: content`, we can't detect the page has navigated via
-    // history api. We need to do some lame detection.
-    document.addEventListener('click', () => {
-      setTimeout(() => {
-        if (location.href !== lastHref) {
-          lastHref = location.href
-          onNavigateListeners.forEach((l) => l())
-        }
-      }, 100)
+    const script = document.createElement('script')
+    script.textContent = `(${listenNavigateCode.toString()})()`
+    document.head.appendChild(script)
+
+    window.addEventListener('npm-userscript-navigate', () => {
+      if (location.href === lastHref) return
+      onNavigateListeners.forEach((l) => l(lastHref))
+      lastHref = location.href
     })
   }
 
-  onNavigateListeners.push(() => {
+  onNavigateListeners.push((previousUrl: string) => {
     // Delay to allow npm to render the new content. Sucks to hardcode but couldn't find a better way.
-    setTimeout(() => listener(), HYDRATION_DELAY_MS)
+    setTimeout(() => listener(previousUrl), HYDRATION_DELAY_MS)
   })
 }

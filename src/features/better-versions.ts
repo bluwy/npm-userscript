@@ -1,4 +1,3 @@
-import { listenNavigate } from '../utils-navigation.ts'
 import { getNpmContext } from '../utils-npm-context.ts'
 import { addStyle, isValidPackagePage } from '../utils.ts'
 
@@ -84,11 +83,6 @@ export function runPre() {
 }
 
 export function run() {
-  _run()
-  listenNavigate(() => _run())
-}
-
-function _run() {
   if (!isValidPackagePage()) return
   if (new URLSearchParams(location.search).get('activeTab') !== 'versions') return
 

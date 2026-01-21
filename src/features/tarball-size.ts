@@ -1,12 +1,20 @@
 import { fetchHeaders } from '../utils-fetch.ts'
-import { getNpmTarballUrl, isValidPackagePage, prettyBytes } from '../utils.ts'
+import { getNpmTarballUrl, isSamePackagePage, isValidPackagePage, prettyBytes } from '../utils.ts'
 
 export const description = `\
 Display the tarball size of the package.
 `
 
+export function teardown(previousUrl: string) {
+  // Skip teardown if navigating from the same package page
+  if (isSamePackagePage(previousUrl)) return
+
+  document.querySelector('.npm-userscript-tarball-size-column')?.remove()
+}
+
 export async function run() {
   if (!isValidPackagePage()) return
+  if (document.querySelector('.npm-userscript-tarball-size-column')) return
 
   const tarballSize = await getTarballSize()
   if (!tarballSize) return
@@ -16,6 +24,7 @@ export async function run() {
   if (!columnToInsertAfter) return
 
   const tarballSizeColumn = columnToInsertAfter.cloneNode(true) as HTMLElement
+  tarballSizeColumn.classList.add('npm-userscript-tarball-size-column')
   tarballSizeColumn.querySelector('h3')!.textContent = 'Tarball Size'
   tarballSizeColumn.querySelector('p')!.textContent = tarballSize
   columnToInsertAfter.insertAdjacentElement('afterend', tarballSizeColumn)

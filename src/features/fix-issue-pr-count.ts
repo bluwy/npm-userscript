@@ -1,11 +1,18 @@
 import { cache } from '../utils-cache.ts'
 import { fetchJson } from '../utils-fetch.ts'
-import { addStyle, isValidPackagePage } from '../utils.ts'
+import { addStyle, isSamePackagePage, isValidPackagePage } from '../utils.ts'
 
 export const description = `\
 Show "Issue" and "Pull Requests" counts in the package sidebar. At the time of writing, npm's own
 implementation is broken for large numbers for some reason. This temporarily fixes it.
 `
+
+export function teardown(previousUrl: string) {
+  // Skip teardown if navigating from the same package page
+  if (isSamePackagePage(previousUrl)) return
+
+  document.querySelectorAll('.npm-userscript-issue-pr-count').forEach((el) => el.remove())
+}
 
 export function runPre() {
   if (!isValidPackagePage()) return
@@ -48,6 +55,8 @@ export async function run() {
     getTotalFilesColumn() // this function will automatically fix the layout
     return
   }
+  // Skip if already run
+  if (document.querySelector('.npm-userscript-issue-pr-count')) return
 
   const repositoryLink = document.getElementById('repository-link')
   const repo = repositoryLink?.textContent?.match(/github\.com\/([^\/]+\/[^\/]+)/)?.[1]
@@ -86,6 +95,7 @@ function getTotalFilesColumn(): HTMLElement | undefined {
 
 function insertCountNode(ref: Element, name: string, count: number, link: string) {
   const cloned = ref.cloneNode(true) as HTMLElement
+  cloned.classList.add('npm-userscript-issue-pr-count')
   cloned.classList.remove('w-100')
   cloned.querySelector('h3')!.textContent = name
   const linkHtml = `<a class="npm-userscript-issue-pr-link" href="${link}">${count}</a>`

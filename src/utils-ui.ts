@@ -1,10 +1,7 @@
 import { computePosition, shift, offset } from '@floating-ui/dom'
 import { addStyle } from './utils.ts'
 
-let addedPackageLabelStyle = false
 export function addPackageLabelStyle() {
-  if (addedPackageLabelStyle) return
-  addedPackageLabelStyle = true
   addStyle(`
     .npm-userscript-package-label {
       display: inline-flex;
@@ -51,8 +48,6 @@ const PACKAGE_LABEL_ORDER = [
   'module-replacements',
 ] as const
 
-const insertedLabels: HTMLElement[] = []
-
 export function addPackageLabel(
   orderKey: (typeof PACKAGE_LABEL_ORDER)[number],
   innerHtml: string,
@@ -70,19 +65,18 @@ export function addPackageLabel(
 
   // Insert in order
   let inserted = false
+  const insertedLabels = document.querySelectorAll<HTMLElement>('.npm-userscript-package-label')
   for (let i = 0; i < insertedLabels.length; i++) {
     const insertedLabel = insertedLabels[i]
     const insertedOrder = Number(insertedLabel.dataset.order)
     if (order < insertedOrder) {
       titleEl.insertBefore(label, insertedLabel)
-      insertedLabels.splice(i, 0, label)
       inserted = true
       return label
     }
   }
   if (!inserted) {
     titleEl.appendChild(label)
-    insertedLabels.push(label)
   }
 
   return label

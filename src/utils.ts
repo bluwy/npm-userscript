@@ -1,14 +1,22 @@
 import { getNpmContext } from './utils-npm-context.ts'
 
 const styles: string[] = []
+let allStyles = ''
 
+/**
+ * Adds a style to the page. If the same css is added multiple times, it will only be included once.
+ */
 export function addStyle(css: string) {
-  styles.push(css.trim())
+  css = css.trim()
+  if (styles.includes(css) || allStyles.includes(css)) return
+  styles.push(css)
 }
 
 export function consolidateStyles() {
   const style = document.createElement('style')
-  style.textContent = styles.join('\n')
+  const combinedStyles = styles.join('\n')
+  style.textContent = combinedStyles
+  allStyles += combinedStyles
   document.head.appendChild(style)
   styles.length = 0
 }
@@ -64,6 +72,30 @@ export function isValidPackagePage(): boolean {
   )
 }
 
+export function isSamePackagePage(previousUrl: string): boolean {
+  const previousPathname = new URL(previousUrl).pathname
+  const newPathname = location.pathname
+  return previousPathname === newPathname
+}
+
+/**
+ * Npm can navigate between two package, e.g. via search results, or different package versions.
+ *
+ * / -> /package/other-package => no teardown
+ * /package/a -> /package/b => teardown
+ * /package/a -> /package/a/v/1.0.0 => teardown
+ * /package/a -> /search?q=package => no teardown
+ *
+ */
+// export function isNavigatingBetweenPackage(previousUrl: string): boolean {
+//   const previousPathname = new URL(previousUrl).pathname
+//   const newPathname = location.pathname
+//   if (previousPathname === newPathname) {
+//     return false
+//   }
+//   return previousPathname.startsWith('/package/') && newPathname.startsWith('/package/')
+// }
+
 export function getNpmTarballUrl() {
   const packument = getNpmContext().context.packument
   const versionData = packument.versions.find((v: any) => (v.version = packument.version))
@@ -85,6 +117,8 @@ export function prettyBytes(bytes: number): string {
   return `${num} ${unit}`
 }
 
+let lastColumnH3Text: string | null = null
+
 /**
  * The sidebar has two-column layout that may have a row only with one column when we inject
  * additional data, which causes the separator to be halved. This function with fix that by
@@ -97,5 +131,17 @@ export function ensureSidebarBalance() {
   if (halfWidthColumns.length % 2 === 1) {
     const lastColumn = halfWidthColumns[halfWidthColumns.length - 1]
     lastColumn.classList.add('w-100')
+    lastColumnH3Text = lastColumn.querySelector('h3')?.textContent || null
+  }
+}
+
+export function teardownSidebarBalance() {
+  if (lastColumnH3Text) {
+    const columns = document.querySelectorAll('[aria-label="Package sidebar"] div.w-50.w-100')
+    const lastColumn = Array.from(columns).find(
+      (col) => col.querySelector('h3')?.textContent === lastColumnH3Text,
+    )
+    lastColumn?.classList.remove('w-100')
+    lastColumnH3Text = null
   }
 }

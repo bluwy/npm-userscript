@@ -1,5 +1,4 @@
 import { fetchPackageJson } from '../utils-fetch.ts'
-import { listenNavigate } from '../utils-navigation.ts'
 import { addStyle, isValidPackagePage } from '../utils.ts'
 
 export const description = `\
@@ -42,15 +41,9 @@ export function runPre() {
   `)
 }
 
-export function run() {
-  _run()
-  listenNavigate(() => _run())
-}
-
-async function _run() {
-  if (!isValidPackagePage()) return ensureTabEmptyOnAway()
-  if (new URLSearchParams(location.search).get('activeTab') !== 'dependencies')
-    return ensureTabEmptyOnAway()
+export async function run() {
+  if (!isValidPackagePage()) return
+  if (new URLSearchParams(location.search).get('activeTab') !== 'dependencies') return
   if (document.querySelector('[aria-label="Peer Dependencies"]')) return
 
   const packageJson = await fetchPackageJson()
@@ -121,9 +114,4 @@ async function _run() {
   for (const el of elements) {
     section.appendChild(el)
   }
-}
-
-function ensureTabEmptyOnAway() {
-  const section = document.getElementById('tabpanel-dependencies')
-  if (section) section.innerHTML = ''
 }

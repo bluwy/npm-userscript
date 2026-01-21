@@ -8,6 +8,7 @@ Move the "Fund this package" button to the bottom of the sidebar.
 
 export function run() {
   if (!isValidPackagePage()) return
+  if (document.querySelector('.npm-userscript-funding-button')) return
 
   // Find funding button. This is poorly tagged, so we just find all the buttons in the sidebar and
   // look for one that contains "Fund this package" text
@@ -23,10 +24,11 @@ export function run() {
   if (fundingButton) {
     // Put it after the collaborators section
     const collaboratorsSection = document.querySelector('div:has(> #collaborators)')
-    collaboratorsSection?.insertAdjacentElement(
-      'afterend',
-      fundingButton.cloneNode(true) as Element,
-    )
+    if (!collaboratorsSection) return
+
+    const cloned = fundingButton.cloneNode(true) as Element
+    cloned.classList.add('npm-userscript-funding-button')
+    collaboratorsSection.insertAdjacentElement('afterend', cloned)
     // NOTE: Do not remove the funding button, otherwise it might mess with npm hydrating
     // (which at this point it should have been hydrated, but just in case)
     fundingButton.style.display = 'none'

@@ -153,8 +153,11 @@ function Settings() {
 }
 
 export function injectSettingsTrigger() {
+  if (document.querySelector('.npm-userscript-settings-trigger')) return
+
   // Fallback to shortcut key sequence
   const button = document.createElement('button')
+  button.classList.add('npm-userscript-settings-trigger')
   button.innerHTML = 'Open Npm Userscript Settings'
   button.style.cssText =
     'font-size: 13px; border: 0px; background: none; cursor: pointer; padding: 0; opacity: 0.8;'

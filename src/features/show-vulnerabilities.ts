@@ -2,13 +2,13 @@ import semverGte from 'semver/functions/gte.js'
 import semverLt from 'semver/functions/lt.js'
 import semverMaxSatisfying from 'semver/ranges/max-satisfying.js'
 import { fetchJson } from '../utils-fetch.ts'
-import { listenNavigate } from '../utils-navigation.ts'
 import { getNpmContext } from '../utils-npm-context.ts'
 import { addPackageLabel, addPackageLabelStyle, computeFloatingUI } from '../utils-ui.ts'
 import {
   addStyle,
   getPackageName,
   getPackageVersion,
+  isSamePackagePage,
   isValidPackagePage,
   waitForElement,
 } from '../utils.ts'
@@ -25,6 +25,15 @@ interface Vulnerability {
   link: string
   score: number
   affected: [string, string][]
+}
+
+export function teardown(previousUrl: string) {
+  // Skip teardown if navigating from the same package page
+  if (isSamePackagePage(previousUrl)) return
+
+  document.querySelector('.npm-userscript-vulnerability-label')?.remove()
+  document.querySelectorAll('.npm-userscript-vulnerability-tag').forEach((el) => el.remove())
+  document.querySelectorAll('.npm-userscript-vulnerability-popup').forEach((el) => el.remove())
 }
 
 export function runPre() {
@@ -66,12 +75,12 @@ export function runPre() {
 }
 
 export async function run() {
-  await _run()
-  listenNavigate(() => _run())
-}
-
-async function _run() {
   if (!isValidPackagePage()) return
+  if (
+    document.querySelector('.npm-userscript-vulnerability-label') &&
+    document.querySelector('.npm-userscript-vulnerability-tag')
+  )
+    return
 
   const packageName = getPackageName()
   const packageVersion = getPackageVersion()
@@ -106,9 +115,11 @@ async function _run() {
 }
 
 async function addVulnerabilityTagToTable(vulns: Vulnerability[]) {
+  if (document.querySelector('.npm-userscript-vulnerability-tag')) return
+
   const featureSettings = await getFeatureSettings()
   if (featureSettings['better-versions'].get() === true) {
-    await waitForElement('aria-labelledby="cumulated-versions"')
+    await waitForElement('[aria-labelledby="cumulated-versions"]')
   }
 
   const allVersions = Object.keys(getNpmContext().context.versionsDownloads)

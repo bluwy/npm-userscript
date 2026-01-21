@@ -1,16 +1,34 @@
 import { allFeatures } from './all-features.ts'
 import { clearOutdatedSettings, featureSettings, injectSettingsTrigger } from './settings.ts'
 import { cache } from './utils-cache.ts'
-import { waitForPageReady } from './utils-navigation.ts'
-import { extractNpmContext } from './utils-npm-context.ts'
-import { consolidateStyles, ensureSidebarBalance } from './utils.ts'
+import { listenNavigate, waitForPageReady } from './utils-navigation.ts'
+import { listenNpmContext, waitForNpmContextReady } from './utils-npm-context.ts'
+import { consolidateStyles, ensureSidebarBalance, teardownSidebarBalance } from './utils.ts'
 
 // esbuild define
 declare global {
   const API_URL: string
 }
 
-runFeatures()
+listenNpmContext()
+runFeatures().then(() => runNotImportantStuff())
+listenNavigate(async (previousUrl) => {
+  const promises: Promise<void>[] = []
+
+  // Run teardown
+  for (const feature in allFeatures) {
+    if (featureSettings[feature].get() === false) continue
+    const promise = allFeatures[feature].teardown?.(previousUrl)?.catch((err) => {
+      console.error(`Error running teardown for feature "${feature}":`, err)
+    })
+    if (promise) promises.push(promise)
+  }
+  await Promise.all(promises)
+
+  teardownSidebarBalance()
+
+  await runFeatures()
+})
 
 async function runFeatures() {
   const promises: Promise<void>[] = []
@@ -29,7 +47,7 @@ async function runFeatures() {
 
   // Let npm's JS run a bit before we run our main features
   await waitForPageReady()
-  await extractNpmContext()
+  await waitForNpmContextReady()
 
   // Run normal
   for (const feature in allFeatures) {
@@ -43,8 +61,12 @@ async function runFeatures() {
   promises.length = 0
   consolidateStyles()
 
-  cache.clearExpired()
+  // "Features" that always run
   ensureSidebarBalance()
   injectSettingsTrigger()
+}
+
+function runNotImportantStuff() {
+  cache.clearExpired()
   clearOutdatedSettings()
 }

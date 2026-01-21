@@ -29,6 +29,11 @@ export interface FeatureModule {
    */
   description: string
   /**
+   * Teardown changes from `runPre` and `run`. Only implemented if UI could linger when navigating
+   * away or to different package pages.
+   */
+  teardown?: (previousUrl: string) => void | Promise<void>
+  /**
    * Run as soon as possible on document load. Some elements may not be rendered yet.
    */
   runPre?: () => void | Promise<void>

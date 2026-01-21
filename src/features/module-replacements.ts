@@ -1,11 +1,21 @@
 import type { ModuleReplacement } from 'module-replacements'
 import { fetchJson, fetchText } from '../utils-fetch.ts'
 import { addPackageLabel, addPackageLabelStyle, computeFloatingUI } from '../utils-ui.ts'
-import { addStyle, getPackageName, isValidPackagePage } from '../utils.ts'
+import { addStyle, getPackageName, isSamePackagePage, isValidPackagePage } from '../utils.ts'
 
 export const description = `\
 Suggest alternatives for the package based on "es-tooling/module-replacements" data set.
 `
+
+export function teardown(previousUrl: string) {
+  // Skip teardown if navigating from the same package page
+  if (isSamePackagePage(previousUrl)) return
+
+  document
+    .querySelectorAll('.npm-userscript-module-replacements-label')
+    .forEach((el) => el.remove())
+  document.querySelectorAll('.npm-userscript-popup').forEach((el) => el.remove())
+}
 
 export function runPre() {
   addPackageLabelStyle()
@@ -36,6 +46,7 @@ export function runPre() {
 
 export async function run() {
   if (!isValidPackagePage()) return
+  if (document.querySelector('.npm-userscript-module-replacements-label')) return
 
   const packageName = getPackageName()
   if (!packageName) return
@@ -50,6 +61,7 @@ export async function run() {
   switch (replacement.type) {
     case 'documented': {
       const label = addPackageLabel('module-replacements', 'Has alternatives', 'info', 'button')
+      label.classList.add('npm-userscript-module-replacements-label')
 
       const popup = document.createElement('div')
       popup.className =
@@ -75,6 +87,7 @@ export async function run() {
         'warning',
         'button',
       )
+      label.classList.add('npm-userscript-module-replacements-label')
 
       let replacementText = replacement.replacement
       if (replacementText.startsWith('Use ')) replacementText = replacementText.slice(4)
@@ -92,6 +105,7 @@ For Node.js v${replacement.nodeVersion} and later, use ${replacementText}.
     }
     case 'simple': {
       const label = addPackageLabel('module-replacements', 'Prefer simpler code', 'error', 'button')
+      label.classList.add('npm-userscript-module-replacements-label')
 
       const popup = document.createElement('div')
       popup.className = 'npm-userscript-popup ' + getReadmeInternalClassName()

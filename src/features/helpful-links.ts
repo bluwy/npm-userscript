@@ -1,4 +1,4 @@
-import { addStyle, getPackageName, isValidPackagePage } from '../utils.ts'
+import { addStyle, getPackageName, isValidPackagePage, isSamePackagePage } from '../utils.ts'
 
 export const description = 'Add helpful links beside the package header for convenience.'
 
@@ -6,6 +6,13 @@ interface LinkData {
   label: string
   url: string
   iconSvg: string
+}
+
+export function teardown(previousUrl: string) {
+  // Skip teardown if navigating from the same package page
+  if (isSamePackagePage(previousUrl)) return
+
+  document.querySelector('.npm-userscript-helpful-links')?.parentElement?.remove()
 }
 
 export function runPre() {
@@ -44,6 +51,7 @@ export function runPre() {
 
 export function run() {
   if (!isValidPackagePage()) return
+  if (document.querySelector('.npm-userscript-helpful-links')) return
 
   const packageName = getPackageName()
   if (!packageName) return

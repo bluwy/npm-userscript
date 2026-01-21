@@ -1,13 +1,20 @@
 import { fetchPackageFilesData, fetchPackageJson } from '../utils-fetch.ts'
 import { getNpmContext } from '../utils-npm-context.ts'
 import { addPackageLabel, addPackageLabelStyle } from '../utils-ui.ts'
-import { addStyle, getPackageName, isValidPackagePage } from '../utils.ts'
+import { addStyle, getPackageName, isSamePackagePage, isValidPackagePage } from '../utils.ts'
 
 export const description = `\
 Adds a label for packages that ship types. This is similar to npm's own DT / TS icon but
 with a more consistent UI. It is also more accurate if the package ship types but isn't detectable
 in the package.json.
 `
+
+export function teardown(previousUrl: string) {
+  // Skip teardown if navigating from the same package page
+  if (isSamePackagePage(previousUrl)) return
+
+  document.querySelector('.npm-userscript-types-label')?.remove()
+}
 
 export function runPre() {
   addPackageLabelStyle()
@@ -20,6 +27,7 @@ export function runPre() {
 
 export async function run() {
   if (!isValidPackagePage()) return
+  if (document.querySelector('.npm-userscript-types-label')) return
 
   const packageName = getPackageName()
   if (!packageName) return
@@ -60,18 +68,20 @@ export async function run() {
     }
   }
 
+  let label: HTMLElement | undefined
   if (typesInfo.type === 'none') {
-    const label = addPackageLabel('show-types-label', 'Untyped', 'warning')
+    label = addPackageLabel('show-types-label', 'Untyped', 'warning')
     label.title = 'This package does not ship TypeScript types'
   } else if (typesInfo.type === 'bundled') {
-    const label = addPackageLabel('show-types-label', 'DTS')
+    label = addPackageLabel('show-types-label', 'DTS')
     label.title = 'This package ships TypeScript types'
   } else if (typesInfo.type === 'package') {
-    const label = addPackageLabel('show-types-label', `DTS: ${typesInfo.packageName}`)
+    label = addPackageLabel('show-types-label', `DTS: ${typesInfo.packageName}`)
     label.title = `This package relies on ${typesInfo.packageName} for TypeScript types`
   } else {
     console.warn('[npm-userscript:show-types-label] unable to determine types info')
   }
+  label?.classList.add('npm-userscript-types-label')
 }
 
 function parseNpmTypes() {

@@ -5,11 +5,18 @@ import {
   type PackageFilesData,
 } from '../utils-fetch.ts'
 import { addPackageLabel, addPackageLabelStyle } from '../utils-ui.ts'
-import { isValidPackagePage } from '../utils.ts'
+import { isSamePackagePage, isValidPackagePage } from '../utils.ts'
 
 export const description = `\
 Show ESM or CJS labels if the package ships them.
 `
+
+export function teardown(previousUrl: string) {
+  // Skip teardown if navigating from the same package page
+  if (isSamePackagePage(previousUrl)) return
+
+  document.querySelectorAll('.npm-userscript-file-types-label').forEach((el) => el.remove())
+}
 
 export function runPre() {
   addPackageLabelStyle()
@@ -17,6 +24,7 @@ export function runPre() {
 
 export async function run() {
   if (!isValidPackagePage()) return
+  if (document.querySelector('.npm-userscript-file-types-label')) return
 
   const data = await fetchPackageFilesData()
   if (!data) return
@@ -28,11 +36,13 @@ export async function run() {
 
   if (fileTypes.hasEsm) {
     const label = addPackageLabel('show-file-types-label', 'ESM')
+    label.classList.add('npm-userscript-file-types-label')
     label.title = 'This package ships ECMAScript Modules (ESM)'
   }
 
   if (fileTypes.hasCjs) {
     const label = addPackageLabel('show-file-types-label', 'CJS')
+    label.classList.add('npm-userscript-file-types-label')
     label.title = 'This package ships CommonJS modules (CJS)'
   }
 }

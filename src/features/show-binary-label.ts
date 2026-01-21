@@ -1,6 +1,6 @@
 import { fetchPackageJson } from '../utils-fetch.ts'
 import { addPackageLabel, addPackageLabelStyle } from '../utils-ui.ts'
-import { isValidPackagePage } from '../utils.ts'
+import { isSamePackagePage, isValidPackagePage } from '../utils.ts'
 
 export const description = `\
 Adds a label for packages that ship prebuilt native binaries.
@@ -9,18 +9,27 @@ Adds a label for packages that ship prebuilt native binaries.
 const popularOs = ['linux', 'darwin', 'win32']
 const popularArch = ['x64', 'arm64', 'ia32']
 
+export function teardown(previousUrl: string) {
+  // Skip teardown if navigating from the same package page
+  if (isSamePackagePage(previousUrl)) return
+
+  document.querySelectorAll('.npm-userscript-types-label').forEach((el) => el.remove())
+}
+
 export function runPre() {
   addPackageLabelStyle()
 }
 
 export async function run() {
   if (!isValidPackagePage()) return
+  if (document.querySelector('.npm-userscript-binary-label')) return
 
   const packageJson = await fetchPackageJson()
   if (!packageJson) return
 
   if (shipsNativeBinaries(packageJson)) {
     const label = addPackageLabel('show-binary-label', 'Has binaries')
+    label.classList.add('npm-userscript-binary-label')
     label.title = 'This package ships prebuilt native binaries via optional dependencies'
     return
   }
@@ -28,6 +37,7 @@ export async function run() {
   const nativeInfo = isNativeBinary(packageJson)
   if (nativeInfo) {
     const label = addPackageLabel('show-binary-label', `${nativeInfo} binary`)
+    label.classList.add('npm-userscript-binary-label')
     label.title = `This package ships prebuilt native binary for ${nativeInfo}`
   }
 }
