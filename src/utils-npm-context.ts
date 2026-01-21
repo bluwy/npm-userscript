@@ -12,18 +12,28 @@ export function getNpmContext() {
 }
 
 function listenNpmContextCode() {
-  document.addEventListener(
-    'DOMContentLoaded',
-    () => {
-      window.dispatchEvent(
-        new CustomEvent('npm-userscript-npm-context:init', {
-          // @ts-expect-error
-          detail: JSON.stringify(window.__context__),
-        }),
-      )
-    },
-    { once: true },
-  )
+  // @ts-expect-error
+  if (window.__context__ != null) {
+    window.dispatchEvent(
+      new CustomEvent('npm-userscript-npm-context:init', {
+        // @ts-expect-error
+        detail: JSON.stringify(window.__context__),
+      }),
+    )
+  } else {
+    document.addEventListener(
+      'DOMContentLoaded',
+      () => {
+        window.dispatchEvent(
+          new CustomEvent('npm-userscript-npm-context:init', {
+            // @ts-expect-error
+            detail: JSON.stringify(window.__context__),
+          }),
+        )
+      },
+      { once: true },
+    )
+  }
 
   // Patch XMLHttpRequest to capture future context changes
   const origOpen = XMLHttpRequest.prototype.open
