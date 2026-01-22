@@ -6,7 +6,7 @@ export const description = `\
 Adds a label if the package defines lifecycle scripts in its package.json.
 `
 
-const LIFECYCLE_SCRIPTS = ['postinstall', 'preinstall', 'install', 'prepublish', 'prepare']
+const LIFECYCLE_SCRIPTS = ['postinstall', 'preinstall', 'install']
 
 export function teardown(previousUrl: string) {
   // Skip teardown if navigating from the same package page
