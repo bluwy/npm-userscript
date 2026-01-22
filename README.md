@@ -4,6 +4,8 @@
 
 [Video demo on Bluesky](https://bsky.app/profile/bluwy.me/post/3ma4pgto2rs2x)
 
+[Screenshots on Bluesky](https://bsky.app/profile/bluwy.me/post/3mcw5cnaxqc25)
+
 Various improvements and fixes for npmjs.com.
 
 ## Features
@@ -29,11 +31,16 @@ Various improvements and fixes for npmjs.com.
 | `show-file-types-label`         | Show ESM or CJS labels if the package ships them.                                                                                                                                                                |
 | `show-lifecycle-scripts-label`  | Adds a label if the package defines lifecycle scripts in its package.json.                                                                                                                                       |
 | `show-types-label`              | Adds a label for packages that ship types. This is similar to npm's own DT / TS icon but with a more consistent UI. It is also more accurate if the package ship types but isn't detectable in the package.json. |
-| `show-vulnerabilities`          | Adds a label if a package is vulnerable in the header and versions table.                                                                                                                                        |
+| `show-vulnerabilities`          | Adds a label if a package is vulnerable in the header and versions table. The core vulnerability data is powered by https://osv.dev.                                                                             |
 | `tarball-size`                  | Display the tarball size of the package.                                                                                                                                                                         |
 | `unpacked-size-and-total-files` | Display the "Unpacked Size" and "Total Files" columns for older packages that lack the data.                                                                                                                     |
 
 <!-- features-table-end -->
+
+## Disclaimer
+
+1. As npm updates their site, some features may break or behave unexpectedly until the userscript is updated accordingly. Please be aware especially when updating sensitive data.
+2. The userscript fetches from https://npm-userscript.bjornlu.workers.dev (a custom Cloudflare Worker) that proxies data from other sources to save on bandwidth. Check the [worker](./worker/) directory for the source code.
 
 ## Sponsors
 
