@@ -28,7 +28,9 @@ export async function fetchPackageFilesData(): Promise<PackageFilesData | undefi
     fetchJson(`https://www.npmjs.com/package/${packageName}/v/${packageVersion}/index`),
   )
 }
-export async function fetchPackageFileContent(hex: string): Promise<string | undefined> {
+export async function fetchPackageFileContent(
+  hex: string,
+): Promise<Record<string, any> | undefined> {
   const packageName = getPackageName()
   if (!packageName) return undefined
   // https://www.npmjs.com/package/vite/file/223635a2336dd42ac73ec67bbea116086875f640bc28fceb8846c572a496d673

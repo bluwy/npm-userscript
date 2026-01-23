@@ -93,8 +93,7 @@ async function detectFileTypes(
       if (candidatePath === '/package.json') {
         return rootPackageJson
       } else if (files[candidatePath]) {
-        const content = await fetchPackageFileContent(files[candidatePath].hex)
-        if (content) return JSON.parse(content)
+        return await fetchPackageFileContent(files[candidatePath].hex)
       }
     }
   }
