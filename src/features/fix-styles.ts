@@ -1,7 +1,7 @@
 import { addStyle, isValidPackagePage } from '../utils.ts'
 
 export const description = `\
-Fix various style issues on the npm site (mostly the package page at the moment).
+Fix various style issues on the npm site.
 `
 
 export function runPre() {
@@ -56,6 +56,20 @@ export function runPre() {
     addStyle(`
       h1 > div[data-nosnippet="true"] {
         display: flex;
+      }
+    `)
+  }
+
+  if (/^\/settings\/.+?\/members/.test(location.pathname)) {
+    // Fix member name alignment
+    addStyle(`
+      #tabpanel-members h3 {
+        width: 300px;
+        flex-grow: 0;
+      }
+
+      #tabpanel-members [data-type="role"] {
+        text-align: left;
       }
     `)
   }
