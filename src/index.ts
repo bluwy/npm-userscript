@@ -1,7 +1,11 @@
 import { allFeatures } from './all-features.ts'
 import { clearOutdatedSettings, featureSettings, injectSettingsTrigger } from './settings.ts'
 import { cache } from './utils-cache.ts'
-import { listenNavigate, waitForPageReady } from './utils-navigation.ts'
+import {
+  listenNavigate,
+  waitForDocumentPartiallyReady,
+  waitForPageReady,
+} from './utils-navigation.ts'
 import { listenNpmContext, waitForNpmContextReady } from './utils-npm-context.ts'
 import { consolidateStyles, ensureSidebarBalance, teardownSidebarBalance } from './utils.ts'
 
@@ -10,23 +14,28 @@ declare global {
   const API_URL: string
 }
 
-listenNpmContext()
+main()
 
-let sequencePromise = runFeatures().then(() => runNotImportantStuff())
-let teardownQueue = 0
+async function main() {
+  await waitForDocumentPartiallyReady()
+  listenNpmContext()
 
-listenNavigate(async (previousUrl) => {
-  teardownQueue++
+  let sequencePromise = runFeatures().then(() => runNotImportantStuff())
+  let teardownQueue = 0
 
-  sequencePromise = sequencePromise.then(async () => {
-    await runTeardown(previousUrl)
-    // If a new navigation happened at this point, don't run the features, run the next teardown again
-    if (teardownQueue-- > 1) return
-    await runFeatures()
-    // Reset the promise chain if there's no more teardowns queued to avoid long chains
-    if (teardownQueue === 0) sequencePromise = Promise.resolve()
+  listenNavigate(async (previousUrl) => {
+    teardownQueue++
+
+    sequencePromise = sequencePromise.then(async () => {
+      await runTeardown(previousUrl)
+      // If a new navigation happened at this point, don't run the features, run the next teardown again
+      if (teardownQueue-- > 1) return
+      await runFeatures()
+      // Reset the promise chain if there's no more teardowns queued to avoid long chains
+      if (teardownQueue === 0) sequencePromise = Promise.resolve()
+    })
   })
-})
+}
 
 async function runTeardown(previousUrl: string) {
   const promises: Promise<void>[] = []

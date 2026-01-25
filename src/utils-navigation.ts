@@ -1,5 +1,21 @@
 const HYDRATION_DELAY_MS = 50
 
+export async function waitForDocumentPartiallyReady(): Promise<void> {
+  // wait for document.body to be not null
+  if (!document.body) {
+    await new Promise<void>((resolve, reject) => {
+      let max = 40 // 40 * 50ms = 2s max
+      setInterval(() => {
+        if (document.body) {
+          resolve()
+        } else if (max-- <= 0) {
+          reject(new Error('[npm-userscript] Document took too long to be ready'))
+        }
+      }, 50)
+    })
+  }
+}
+
 let pageAlreadyReady = false
 export async function waitForPageReady(): Promise<void> {
   if (!pageAlreadyReady) {
