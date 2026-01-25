@@ -12,8 +12,10 @@ export function teardown(previousUrl: string) {
   document.querySelector('.npm-userscript-stars-column')?.remove()
 }
 
-export function runPre() {
+export async function runPre() {
   if (!isValidPackagePage()) return
+  // Info will be in the card, no need to render
+  if ((await getFeatureSettings())['repository-card'].get() === true) return
 
   addStyle(`
     .npm-userscript-stars-link {
@@ -30,6 +32,8 @@ export function runPre() {
 
 export async function run() {
   if (!isValidPackagePage()) return
+  // Info will be in the card, no need to render
+  if ((await getFeatureSettings())['repository-card'].get() === true) return
   if (document.querySelector('.npm-userscript-stars-column')) return
 
   const sidebarColumns = document.querySelectorAll('[aria-label="Package sidebar"] > div:has(> h3)')
@@ -51,4 +55,9 @@ export async function run() {
   const linkHtml = `<a class="npm-userscript-stars-link" href="${link}">${count}</a>`
   cloned.querySelector('p')!.innerHTML = linkHtml
   ref.insertAdjacentElement('afterend', cloned)
+}
+
+async function getFeatureSettings() {
+  const settings = await import('../settings.ts')
+  return settings.featureSettings
 }

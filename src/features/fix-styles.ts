@@ -58,6 +58,13 @@ export function runPre() {
         display: flex;
       }
     `)
+
+    // Remove spacing under install
+    addStyle(`
+      aside[aria-label="Package sidebar"] > h3 + div {
+        margin-bottom: 0;
+      }
+    `)
   }
 
   if (/^\/settings\/.+?\/members/.test(location.pathname)) {

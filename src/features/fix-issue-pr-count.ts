@@ -1,5 +1,4 @@
-import { cache, cacheResult } from '../utils-cache.ts'
-import { fetchGitHubRepoData, fetchHeaders, fetchJson } from '../utils-fetch.ts'
+import { fetchGitHubPullRequestsCount, fetchGitHubRepoData } from '../utils-fetch.ts'
 import {
   addStyle,
   getGitHubOwnerRepo,
@@ -20,8 +19,10 @@ export function teardown(previousUrl: string) {
   document.querySelectorAll('.npm-userscript-issue-pr-count').forEach((el) => el.remove())
 }
 
-export function runPre() {
+export async function runPre() {
   if (!isValidPackagePage()) return
+  // Info will be in the card, no need to render
+  if ((await getFeatureSettings())['repository-card'].get() === true) return
 
   addStyle(`
     #issues + p,
@@ -51,23 +52,21 @@ export function runPre() {
 
 export async function run() {
   if (!isValidPackagePage()) return
+  // Info will be in the card, no need to render
+  if ((await getFeatureSettings())['repository-card'].get() === true) return
 
   // Wait 2 seconds to allow npm to render first in case it works
   await new Promise((resolve) => setTimeout(resolve, 2000))
 
   // Skip if npm already renders them
-  if (document.getElementById('issues') || document.getElementById('pulls')) {
-    // Just make sure they're on the same row
-    getTotalFilesColumn() // this function will automatically fix the layout
-    return
-  }
+  if (document.getElementById('issues') || document.getElementById('pulls')) return
   // Skip if already run
   if (document.querySelector('.npm-userscript-issue-pr-count')) return
 
   const ownerRepo = getGitHubOwnerRepo()
   if (!ownerRepo) return
 
-  const counts = await fetchIssueAndPrCount(ownerRepo)
+  const counts = await fetchIssueAndPrCount()
 
   let ref: HTMLElement | undefined
   if ((await getFeatureSettings())['stars'].get() === true) {
@@ -83,25 +82,31 @@ export async function run() {
   if (document.getElementById('issues') || document.getElementById('pulls')) return
 
   insertCountNode(ref, 'Pull Requests', counts.pulls, `https://github.com/${ownerRepo}/pulls`)
-  insertCountNode(ref, 'Issues', counts.issues, `https://github.com/${ownerRepo}/issues`)
+  const c = insertCountNode(ref, 'Issues', counts.issues, `https://github.com/${ownerRepo}/issues`)
+  balanceColumn(c)
 }
 
 function getTotalFilesColumn(): HTMLElement | undefined {
+  const sidebarColumns = document.querySelectorAll<HTMLElement>(
+    '[aria-label="Package sidebar"] div.w-50:not(.w-100)',
+  )
+  return Array.from(sidebarColumns).find((el) =>
+    el.querySelector('h3')?.textContent.includes('Total Files'),
+  )
+}
+
+// The issue and pr count must be on the same row, so if the total files column's row isn't filled,
+// we need to extend it to full width
+function balanceColumn(column: HTMLElement) {
   const sidebarColumns = document.querySelectorAll(
     '[aria-label="Package sidebar"] div.w-50:not(.w-100)',
   )
-  const refIndex = Array.from(sidebarColumns).findIndex((el) =>
-    el.querySelector('h3')?.textContent.includes('Total Files'),
-  )
-  if (refIndex === -1) return
-
-  const ref = sidebarColumns[refIndex] as HTMLElement
-  if (refIndex % 2 === 0) {
-    // The issue and pr count must be on the same row, so if the total files column's row isn't filled,
-    // we need to extend it to full width
-    ref.classList.add('w-100')
+  const columnIndex = Array.from(sidebarColumns).indexOf(column)
+  if (columnIndex % 2 === 1) {
+    const previousColumn = sidebarColumns[columnIndex - 1]
+    if (!previousColumn) return
+    previousColumn.classList.add('w-100')
   }
-  return ref
 }
 
 function insertCountNode(ref: Element, name: string, count: number, link: string) {
@@ -112,25 +117,15 @@ function insertCountNode(ref: Element, name: string, count: number, link: string
   const linkHtml = `<a class="npm-userscript-issue-pr-link" href="${link}">${count}</a>`
   cloned.querySelector('p')!.innerHTML = linkHtml
   ref.insertAdjacentElement('afterend', cloned)
+  return cloned
 }
 
-async function fetchIssueAndPrCount(ownerRepo: string): Promise<{ issues: number; pulls: number }> {
+async function fetchIssueAndPrCount(): Promise<{ issues: number; pulls: number }> {
   const data = await fetchGitHubRepoData()
   if (!data) return { issues: 0, pulls: 0 }
 
-  const prCount = await cacheResult(`fetchIssueAndPrCount:${ownerRepo}`, 60, async () => {
-    const headers = await fetchHeaders(`https://api.github.com/repos/${ownerRepo}/pulls?per_page=1`)
-    // Example header:
-    // ...
-    // Link: <https://api.github.com/repositories/74293321/pulls?per_page=1&page=2>; rel="next", <https://api.github.com/repositories/74293321/pulls?per_page=1&page=75>; rel="last"
-    // ...
-    // Fetch the last page= number
-    const match =
-      /<https:\/\/api\.github\.com\/repositories\/\d+\/pulls\?per_page=1&page=(\d+)>;\s*rel="last"/.exec(
-        headers,
-      )
-    return match ? Number(match[1]) : 0
-  })
+  const prCount = await fetchGitHubPullRequestsCount()
+  if (prCount === undefined) return { issues: 0, pulls: 0 }
 
   const issueAndPrCount = data.open_issues_count as number
   const issues = issueAndPrCount - prCount

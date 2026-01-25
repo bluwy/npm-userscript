@@ -77,6 +77,24 @@ export async function fetchGitHubRepoData(): Promise<Record<string, any> | undef
   )
 }
 
+export async function fetchGitHubPullRequestsCount(): Promise<number | undefined> {
+  const ownerRepo = getGitHubOwnerRepo()
+  if (!ownerRepo) return undefined
+  return cacheResult(`fetchPrCount:${ownerRepo}`, 60, async () => {
+    const headers = await fetchHeaders(`https://api.github.com/repos/${ownerRepo}/pulls?per_page=1`)
+    // Example header:
+    // ...
+    // Link: <https://api.github.com/repositories/74293321/pulls?per_page=1&page=2>; rel="next", <https://api.github.com/repositories/74293321/pulls?per_page=1&page=75>; rel="last"
+    // ...
+    // Fetch the last page= number
+    const match =
+      /<https:\/\/api\.github\.com\/repositories\/\d+\/pulls\?per_page=1&page=(\d+)>;\s*rel="last"/.exec(
+        headers,
+      )
+    return match ? Number(match[1]) : 0
+  })
+}
+
 // === GENERAL FETCH HELPERS ===
 
 export interface FetchRequestInit extends Pick<RequestInit, 'method' | 'headers' | 'body'> {}

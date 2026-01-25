@@ -9,6 +9,7 @@ import * as moveFunding from './features/move-funding.ts'
 import * as noCodeBeta from './features/no-code-beta.ts'
 import * as rememberBanner from './features/remember-banner.ts'
 import * as removeRunkit from './features/remove-runkit.ts'
+import * as repositoryCard from './features/repository-card.ts'
 import * as repositoryDirectory from './features/repository-directory.ts'
 import * as showBinaryLabel from './features/show-binary-label.ts'
 import * as showCliLabelAndCommand from './features/show-cli-label-and-command.ts'
@@ -57,6 +58,7 @@ export const allFeatures: Record<string, FeatureModule> = {
   'no-code-beta': noCodeBeta,
   'remember-banner': rememberBanner,
   'remove-runkit': removeRunkit,
+  'repository-card': repositoryCard,
   'repository-directory': repositoryDirectory,
   'show-binary-label': showBinaryLabel,
   'show-cli-label': showCliLabelAndCommand,
