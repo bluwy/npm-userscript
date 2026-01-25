@@ -1,4 +1,8 @@
-import { fetchGitHubPullRequestsCount, fetchGitHubRepoData, fetchPackageJson } from '../utils-fetch.ts'
+import {
+  fetchGitHubPullRequestsCount,
+  fetchGitHubRepoData,
+  fetchPackageJson,
+} from '../utils-fetch.ts'
 import { addStyle, isSamePackagePage, isValidPackagePage } from '../utils.ts'
 
 export const description = `\

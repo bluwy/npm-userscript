@@ -1,5 +1,6 @@
 const HYDRATION_DELAY_MS = 50
 
+// Some userscript managers allow executing a lot early than expected. We need at least the DOM ready in our script.
 export async function waitForDocumentPartiallyReady(): Promise<void> {
   // wait for document.body to be not null
   if (!document.body) {
