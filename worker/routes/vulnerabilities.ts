@@ -43,7 +43,7 @@ export const handler: RouteHandler = async (request, env, ctx) => {
           const score = cvss.calculateScores().overall
 
           // Try to get the CVE- prefix name if possible
-          const id = vuln.aliases.find((a: string) => a.startsWith('CVE-')) ?? vuln.id
+          const id = vuln.aliases?.find((a: string) => a.startsWith('CVE-')) ?? vuln.id
           // Try to get the link that contains the id first, then the specific ADVISORY type, else the first
           const link = (
             vuln.references.find((ref: any) => ref.url.includes(id)) ??
@@ -73,7 +73,7 @@ export const handler: RouteHandler = async (request, env, ctx) => {
         }),
       }
     } catch (e) {
-      // console.error('Error processing data', e, json)
+      console.error('Error processing data', e, json)
       return new Response('Error processing data', { status: 500 })
     }
   }
