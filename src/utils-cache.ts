@@ -70,9 +70,18 @@ function hasCacheByPrefix(prefix: string): boolean {
 }
 
 const _inMemoryCache: Record<string, any> = {}
-export function inMemoryCache<T>(key: string, fn: () => T | Promise<T>): T | Promise<T> {
+export function cacheResult<T>(
+  key: string,
+  duration: number,
+  fn: () => T | Promise<T>,
+): T | Promise<T> {
   if (key in _inMemoryCache) {
     return _inMemoryCache[key]
+  }
+
+  if (duration > 0) {
+    const cached = cache.get(key)
+    if (cached !== null) return JSON.parse(cached) as T
   }
 
   const result = fn()
@@ -82,7 +91,14 @@ export function inMemoryCache<T>(key: string, fn: () => T | Promise<T>): T | Pro
     // @ts-expect-error
     result.then((resolved) => {
       _inMemoryCache[key] = resolved
+      if (duration > 0) {
+        cache.set(key, JSON.stringify(resolved), duration)
+      }
     })
+  } else {
+    if (duration > 0) {
+      cache.set(key, JSON.stringify(result), duration)
+    }
   }
   return result
 }

@@ -1,5 +1,5 @@
-import { cache } from '../utils-cache.ts'
-import { fetchJson } from '../utils-fetch.ts'
+import { cache, cacheResult } from '../utils-cache.ts'
+import { fetchGitHubRepoData, fetchHeaders, fetchJson } from '../utils-fetch.ts'
 import {
   addStyle,
   getGitHubOwnerRepo,
@@ -67,7 +67,7 @@ export async function run() {
   const ownerRepo = getGitHubOwnerRepo()
   if (!ownerRepo) return
 
-  const counts = await getIssueAndPrCount(ownerRepo)
+  const counts = await fetchIssueAndPrCount(ownerRepo)
 
   let ref: HTMLElement | undefined
   if ((await getFeatureSettings())['stars'].get() === true) {
@@ -114,26 +114,29 @@ function insertCountNode(ref: Element, name: string, count: number, link: string
   ref.insertAdjacentElement('afterend', cloned)
 }
 
-async function getIssueAndPrCount(ownerRepo: string): Promise<{ issues: number; pulls: number }> {
-  const cached = cache.get(`issue-pr-count:${ownerRepo}`)
-  if (cached) return JSON.parse(cached)
+async function fetchIssueAndPrCount(ownerRepo: string): Promise<{ issues: number; pulls: number }> {
+  const data = await fetchGitHubRepoData()
+  if (!data) return { issues: 0, pulls: 0 }
 
-  const issues = fetchJson(
-    `https://api.github.com/search/issues?q=repo:${ownerRepo}+type:issue+state:open&per_page=0`,
-  )
-    .then((data) => data.total_count ?? 0)
-    .catch(() => 0)
+  const prCount = await cacheResult(`fetchIssueAndPrCount:${ownerRepo}`, 60, async () => {
+    const headers = await fetchHeaders(`https://api.github.com/repos/${ownerRepo}/pulls?per_page=1`)
+    // Example header:
+    // ...
+    // Link: <https://api.github.com/repositories/74293321/pulls?per_page=1&page=2>; rel="next", <https://api.github.com/repositories/74293321/pulls?per_page=1&page=75>; rel="last"
+    // ...
+    // Fetch the last page= number
+    const match =
+      /<https:\/\/api\.github\.com\/repositories\/\d+\/pulls\?per_page=1&page=(\d+)>;\s*rel="last"/.exec(
+        headers,
+      )
+    return match ? Number(match[1]) : 0
+  })
 
-  const pulls = fetchJson(
-    `https://api.github.com/search/issues?q=repo:${ownerRepo}+type:pr+state:open&per_page=0`,
-  )
-    .then((data) => data.total_count ?? 0)
-    .catch(() => 0)
+  const issueAndPrCount = data.open_issues_count as number
+  const issues = issueAndPrCount - prCount
+  const pulls = prCount
 
-  const promises = await Promise.all([issues, pulls])
-  const result = { issues: promises[0], pulls: promises[1] }
-  cache.set(`issue-pr-count:${ownerRepo}`, JSON.stringify(result), 60) // Cache result for 1 minute
-  return result
+  return { issues, pulls }
 }
 
 async function getFeatureSettings() {

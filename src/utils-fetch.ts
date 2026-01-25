@@ -1,4 +1,4 @@
-import { inMemoryCache } from './utils-cache.ts'
+import { cacheResult } from './utils-cache.ts'
 import { getGitHubOwnerRepo, getPackageName, getPackageVersion } from './utils.ts'
 
 export interface PackageFilesData {
@@ -24,7 +24,7 @@ export async function fetchPackageFilesData(): Promise<PackageFilesData | undefi
   const packageVersion = getPackageVersion()
   if (!packageName || !packageVersion) return undefined
   // This uses the same data from the code tab
-  return inMemoryCache(`fetchPackageFiles:${packageName}@${packageVersion}`, () =>
+  return cacheResult(`fetchPackageFiles:${packageName}@${packageVersion}`, 60, () =>
     fetchJson(`https://www.npmjs.com/package/${packageName}/v/${packageVersion}/index`),
   )
 }
@@ -35,7 +35,7 @@ export async function fetchPackageFileContent(
   if (!packageName) return undefined
   // https://www.npmjs.com/package/vite/file/223635a2336dd42ac73ec67bbea116086875f640bc28fceb8846c572a496d673
   // This uses the same data from the code tab
-  return inMemoryCache(`fetchPackageFiles:${packageName}-${hex}`, () =>
+  return cacheResult(`fetchPackageFiles:${packageName}-${hex}`, 0, () =>
     fetchJson(`https://www.npmjs.com/package/${packageName}/file/${hex}`),
   )
 }
@@ -44,7 +44,7 @@ export async function fetchPackageJson(): Promise<Record<string, any> | undefine
   const packageName = getPackageName()
   const packageVersion = getPackageVersion()
   if (!packageName || !packageVersion) return undefined
-  return inMemoryCache(`fetchPackageJson:${packageName}@${packageVersion}`, () =>
+  return cacheResult(`fetchPackageJson:${packageName}@${packageVersion}`, 60, () =>
     fetchJson(`https://registry.npmjs.org/${packageName}/${packageVersion}`),
   )
 }
@@ -52,7 +52,7 @@ export async function fetchPackageJson(): Promise<Record<string, any> | undefine
 export async function fetchGitHubRepoData(): Promise<Record<string, any> | undefined> {
   const ownerRepo = getGitHubOwnerRepo()
   if (!ownerRepo) return undefined
-  return inMemoryCache(`fetchGitHubRepoData:${ownerRepo}`, () =>
+  return cacheResult(`fetchGitHubRepoData:${ownerRepo}`, 60, () =>
     fetchJson(`https://api.github.com/repos/${ownerRepo}`),
   )
 }
