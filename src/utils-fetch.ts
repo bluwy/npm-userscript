@@ -1,5 +1,5 @@
 import { inMemoryCache } from './utils-cache.ts'
-import { getPackageName, getPackageVersion } from './utils.ts'
+import { getGitHubOwnerRepo, getPackageName, getPackageVersion } from './utils.ts'
 
 export interface PackageFilesData {
   totalSize: number
@@ -48,6 +48,16 @@ export async function fetchPackageJson(): Promise<Record<string, any> | undefine
     fetchJson(`https://registry.npmjs.org/${packageName}/${packageVersion}`),
   )
 }
+
+export async function fetchGitHubRepoData(): Promise<Record<string, any> | undefined> {
+  const ownerRepo = getGitHubOwnerRepo()
+  if (!ownerRepo) return undefined
+  return inMemoryCache(`fetchGitHubRepoData:${ownerRepo}`, () =>
+    fetchJson(`https://api.github.com/repos/${ownerRepo}`),
+  )
+}
+
+// === GENERAL FETCH HELPERS ===
 
 export interface FetchRequestInit extends Pick<RequestInit, 'method' | 'headers' | 'body'> {}
 

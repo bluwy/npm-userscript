@@ -16,6 +16,7 @@ import * as showFileTypesLabel from './features/show-file-types-label.ts'
 import * as showLifecycleScriptsLabel from './features/show-lifecycle-scripts-label.ts'
 import * as showTypesLabel from './features/show-types-label.ts'
 import * as showVulnerabilities from './features/show-vulnerabilities.ts'
+import * as stars from './features/stars.ts'
 import * as tarballSize from './features/tarball-size.ts'
 import * as unpackedSizeAndTotalFiles from './features/unpacked-size-and-total-files.ts'
 
@@ -62,6 +63,7 @@ export const allFeatures: Record<string, FeatureModule> = {
   'show-lifecycle-scripts-label': showLifecycleScriptsLabel,
   'show-types-label': showTypesLabel,
   'show-vulnerabilities': showVulnerabilities,
+  'stars': stars,
   'tarball-size': tarballSize,
   'unpacked-size-and-total-files': unpackedSizeAndTotalFiles,
 }

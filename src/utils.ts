@@ -21,10 +21,11 @@ export function consolidateStyles() {
   styles.length = 0
 }
 
-export async function waitForElement(selector: string, timeout = 1000): Promise<void> {
-  if (document.querySelector(selector)) return
+export async function waitForElement(selector: string, timeout = 1000): Promise<HTMLElement> {
+  const element = document.querySelector<HTMLElement>(selector)
+  if (element) return element
 
-  return new Promise<void>((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     const timeoutTimer = setTimeout(() => {
       clearInterval(queryTimer)
       clearInterval(timeoutTimer)
@@ -32,10 +33,11 @@ export async function waitForElement(selector: string, timeout = 1000): Promise<
     }, timeout)
 
     const queryTimer = setInterval(() => {
-      if (document.querySelector(selector)) {
+      const element = document.querySelector<HTMLElement>(selector)
+      if (element) {
         clearInterval(queryTimer)
         clearTimeout(timeoutTimer)
-        resolve()
+        resolve(element)
       }
     }, 100)
   })
@@ -78,23 +80,10 @@ export function isSamePackagePage(previousUrl: string): boolean {
   return previousPathname === newPathname
 }
 
-/**
- * Npm can navigate between two package, e.g. via search results, or different package versions.
- *
- * / -> /package/other-package => no teardown
- * /package/a -> /package/b => teardown
- * /package/a -> /package/a/v/1.0.0 => teardown
- * /package/a -> /search?q=package => no teardown
- *
- */
-// export function isNavigatingBetweenPackage(previousUrl: string): boolean {
-//   const previousPathname = new URL(previousUrl).pathname
-//   const newPathname = location.pathname
-//   if (previousPathname === newPathname) {
-//     return false
-//   }
-//   return previousPathname.startsWith('/package/') && newPathname.startsWith('/package/')
-// }
+export function getGitHubOwnerRepo(): string | undefined {
+  const repositoryLink = getNpmContext().context.packument.repository
+  return /github\.com\/([^\/]+\/[^\/]+)/.exec(repositoryLink)?.[1]
+}
 
 export function getNpmTarballUrl() {
   const packument = getNpmContext().context.packument

@@ -32,6 +32,7 @@ Various improvements and fixes for npmjs.com.
 | `show-lifecycle-scripts-label`  | Adds a label if the package defines lifecycle scripts in its package.json.                                                                                                                                       |
 | `show-types-label`              | Adds a label for packages that ship types. This is similar to npm's own DT / TS icon but with a more consistent UI. It is also more accurate if the package ship types but isn't detectable in the package.json. |
 | `show-vulnerabilities`          | Adds a label if a package is vulnerable in the header and versions table. The core vulnerability data is powered by https://osv.dev.                                                                             |
+| `stars`                         | Display a "Stars" column in the package sidebar for GitHub repos.                                                                                                                                                |
 | `tarball-size`                  | Display the tarball size of the package.                                                                                                                                                                         |
 | `unpacked-size-and-total-files` | Display the "Unpacked Size" and "Total Files" columns for older packages that lack the data.                                                                                                                     |
 

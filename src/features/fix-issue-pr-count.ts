@@ -1,7 +1,12 @@
 import { cache } from '../utils-cache.ts'
 import { fetchJson } from '../utils-fetch.ts'
-import { getNpmContext } from '../utils-npm-context.ts'
-import { addStyle, isSamePackagePage, isValidPackagePage } from '../utils.ts'
+import {
+  addStyle,
+  getGitHubOwnerRepo,
+  isSamePackagePage,
+  isValidPackagePage,
+  waitForElement,
+} from '../utils.ts'
 
 export const description = `\
 Show "Issue" and "Pull Requests" counts in the package sidebar. At the time of writing, npm's own
@@ -59,21 +64,26 @@ export async function run() {
   // Skip if already run
   if (document.querySelector('.npm-userscript-issue-pr-count')) return
 
-  const repositoryLink = getNpmContext().context.packument.repository
-  const repo = repositoryLink?.match(/github\.com\/([^\/]+\/[^\/]+)/)?.[1]
-  if (!repo) return
+  const ownerRepo = getGitHubOwnerRepo()
+  if (!ownerRepo) return
 
-  const counts = await getIssueAndPrCount(repo)
+  const counts = await getIssueAndPrCount(ownerRepo)
 
-  // Place the counts in the sidebar after the "Total Files" section
-  const ref = getTotalFilesColumn()
+  let ref: HTMLElement | undefined
+  if ((await getFeatureSettings())['stars'].get() === true) {
+    // If the stars feature is enabled, wait for it to render first
+    ref = await waitForElement('.npm-userscript-stars-column', 5000)
+  } else {
+    // Place the counts in the sidebar after the "Total Files" section
+    ref = getTotalFilesColumn()
+  }
   if (!ref) return
 
   // Just in case again, if npm has rendered them, skip
   if (document.getElementById('issues') || document.getElementById('pulls')) return
 
-  insertCountNode(ref, 'Pull Requests', counts.pulls, `https://github.com/${repo}/pulls`)
-  insertCountNode(ref, 'Issues', counts.issues, `https://github.com/${repo}/issues`)
+  insertCountNode(ref, 'Pull Requests', counts.pulls, `https://github.com/${ownerRepo}/pulls`)
+  insertCountNode(ref, 'Issues', counts.issues, `https://github.com/${ownerRepo}/issues`)
 }
 
 function getTotalFilesColumn(): HTMLElement | undefined {
@@ -104,24 +114,29 @@ function insertCountNode(ref: Element, name: string, count: number, link: string
   ref.insertAdjacentElement('afterend', cloned)
 }
 
-async function getIssueAndPrCount(repo: string): Promise<{ issues: number; pulls: number }> {
-  const cached = cache.get(`issue-pr-count:${repo}`)
+async function getIssueAndPrCount(ownerRepo: string): Promise<{ issues: number; pulls: number }> {
+  const cached = cache.get(`issue-pr-count:${ownerRepo}`)
   if (cached) return JSON.parse(cached)
 
   const issues = fetchJson(
-    `https://api.github.com/search/issues?q=repo:${repo}+type:issue+state:open&per_page=0`,
+    `https://api.github.com/search/issues?q=repo:${ownerRepo}+type:issue+state:open&per_page=0`,
   )
     .then((data) => data.total_count ?? 0)
     .catch(() => 0)
 
   const pulls = fetchJson(
-    `https://api.github.com/search/issues?q=repo:${repo}+type:pr+state:open&per_page=0`,
+    `https://api.github.com/search/issues?q=repo:${ownerRepo}+type:pr+state:open&per_page=0`,
   )
     .then((data) => data.total_count ?? 0)
     .catch(() => 0)
 
   const promises = await Promise.all([issues, pulls])
   const result = { issues: promises[0], pulls: promises[1] }
-  cache.set(`issue-pr-count:${repo}`, JSON.stringify(result), 60) // Cache result for 1 minute
+  cache.set(`issue-pr-count:${ownerRepo}`, JSON.stringify(result), 60) // Cache result for 1 minute
   return result
+}
+
+async function getFeatureSettings() {
+  const settings = await import('../settings.ts')
+  return settings.featureSettings
 }
