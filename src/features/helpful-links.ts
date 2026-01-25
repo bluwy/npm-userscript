@@ -1,3 +1,4 @@
+import { getNpmContext } from '../utils-npm-context.ts'
 import { addStyle, getPackageName, isValidPackagePage, isSamePackagePage } from '../utils.ts'
 
 export const description = 'Add helpful links beside the package header for convenience.'
@@ -93,9 +94,7 @@ export function run() {
 }
 
 function getRepoLinkData(): LinkData | undefined {
-  const repositoryLink = document.querySelector<HTMLAnchorElement>(
-    'a[aria-labelledby*=repository-link]',
-  )
+  const repositoryLink = getNpmContext().context.packument.repository
   if (repositoryLink) {
     return {
       label: 'Repository',
@@ -106,9 +105,7 @@ function getRepoLinkData(): LinkData | undefined {
 }
 
 function getHomepageLinkData(): LinkData | undefined {
-  const homepageLink = document.querySelector<HTMLAnchorElement>(
-    'a[aria-labelledby*=homePage-link]',
-  )
+  const homepageLink = getNpmContext().context.packument.homepage
   if (homepageLink) {
     return {
       label: 'Homepage',
@@ -119,16 +116,12 @@ function getHomepageLinkData(): LinkData | undefined {
 }
 
 function getFundingLinkData(): LinkData | undefined {
-  const sidebarLinks = document.querySelectorAll<HTMLAnchorElement>(
-    '[aria-label="Package sidebar"] a',
-  )
-  for (const a of sidebarLinks) {
-    if (a.textContent === 'Fund this package') {
-      return {
-        label: 'Fund this package',
-        url: a.href,
-        iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-hidden="true"><path fill="#fa5b9b" d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"></path></svg>`,
-      }
+  const fundingLink = getNpmContext().context.packument.funding?.url
+  if (fundingLink) {
+    return {
+      label: 'Fund this package',
+      url: fundingLink,
+      iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-hidden="true"><path fill="#fa5b9b" d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"></path></svg>`,
     }
   }
 }

@@ -1,5 +1,6 @@
 import { cache } from '../utils-cache.ts'
 import { fetchJson } from '../utils-fetch.ts'
+import { getNpmContext } from '../utils-npm-context.ts'
 import { addStyle, isSamePackagePage, isValidPackagePage } from '../utils.ts'
 
 export const description = `\
@@ -58,8 +59,8 @@ export async function run() {
   // Skip if already run
   if (document.querySelector('.npm-userscript-issue-pr-count')) return
 
-  const repositoryLink = document.getElementById('repository-link')
-  const repo = repositoryLink?.textContent?.match(/github\.com\/([^\/]+\/[^\/]+)/)?.[1]
+  const repositoryLink = getNpmContext().context.packument.repository
+  const repo = repositoryLink?.match(/github\.com\/([^\/]+\/[^\/]+)/)?.[1]
   if (!repo) return
 
   const counts = await getIssueAndPrCount(repo)
