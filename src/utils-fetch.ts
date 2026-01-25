@@ -1,4 +1,5 @@
 import { cacheResult } from './utils-cache.ts'
+import { getNpmContext } from './utils-npm-context.ts'
 import { getGitHubOwnerRepo, getPackageName, getPackageVersion } from './utils.ts'
 
 export interface PackageFilesData {
@@ -17,6 +18,25 @@ export interface PackageFilesDataFile {
   linesCount: number
   hex: string
   isBinary: string // "true" | "false" (amazing npm)
+}
+
+export async function getFullRepositoryLink(): Promise<string | undefined> {
+  const repositoryLink = getNpmContext().context.packument.repository
+  if (!repositoryLink) return
+
+  const packageJson = await fetchPackageJson()
+  const directory = packageJson?.repository?.directory
+  if (!directory) return
+
+  let fullRepositoryLink = repositoryLink
+  if (!/\/tree\/.+$/.test(repositoryLink)) {
+    // Append /tree/<default_branch>/ if no branch is specified
+    const repoData = await fetchGitHubRepoData()
+    if (!repoData) return
+    fullRepositoryLink += `/tree/${repoData.default_branch}`
+  }
+  fullRepositoryLink += `/${directory.replace(/^\/+/, '')}`
+  return fullRepositoryLink
 }
 
 export async function fetchPackageFilesData(): Promise<PackageFilesData | undefined> {
