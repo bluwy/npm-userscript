@@ -1,12 +1,15 @@
 # Npm Userscript
 
-[Install on Greasyfork](https://greasyfork.org/en/scripts/559139-npm-userscript)
+Various improvements and fixes for npmjs.com. [Install on Greasyfork](https://greasyfork.org/en/scripts/559139-npm-userscript).
 
-[Video demo on Bluesky](https://bsky.app/profile/bluwy.me/post/3ma4pgto2rs2x)
+|                                                Before                                                |                                                After                                                |
+| :--------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------: |
+| ![npmjs.com before](https://github.com/user-attachments/assets/4ecd020f-ec09-4449-b348-ad9da6a8075b) | ![npmjs.com after](https://github.com/user-attachments/assets/161af209-8b55-47c8-ab51-cef81df3336a) |
 
-[Screenshots on Bluesky](https://bsky.app/profile/bluwy.me/post/3mcw5cnaxqc25)
+Additional demos:
 
-Various improvements and fixes for npmjs.com.
+- [Video demo on Bluesky](https://bsky.app/profile/bluwy.me/post/3ma4pgto2rs2x)
+- [Screenshots on Bluesky](https://bsky.app/profile/bluwy.me/post/3mcw5cnaxqc25)
 
 ## Features
 
@@ -24,7 +27,6 @@ Various improvements and fixes for npmjs.com.
 | `move-funding`                  | Move the "Fund this package" button to the bottom of the sidebar.                                                                                                                                                |
 | `no-code-beta`                  | **[Disabled by default]** Hide the "Beta" label in the package code tab.                                                                                                                                         |
 | `remember-banner`               | Remember the banner at the top of the page when dismissed, so it doesn't keep showing up.                                                                                                                        |
-| `remove-redundant-homepage`     | Remove the homepage link if it's the same as the repository link, or only has a hash to the readme.                                                                                                              |
 | `remove-runkit`                 | Remove the RunKit link as it's dead.                                                                                                                                                                             |
 | `repository-card`               | Consolidates all repository information in a card-like view in the package sidebar. Enabling this would remove the "Stars", "Issues", and "Pull Requests" columns.                                               |
 | `repository-directory`          | Adds the repository directory to the repository link.                                                                                                                                                            |
