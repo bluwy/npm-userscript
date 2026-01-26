@@ -2,6 +2,7 @@ import type { ModuleReplacement } from 'module-replacements'
 import { fetchJson, fetchText } from '../utils-fetch.ts'
 import { addPackageLabel, addPackageLabelStyle, computeFloatingUI } from '../utils-ui.ts'
 import { addStyle, getPackageName, isSamePackagePage, isValidPackagePage } from '../utils.ts'
+import { cacheResult } from '../utils-cache.ts'
 
 export const description = `\
 Suggest alternatives for the package based on "es-tooling/module-replacements" data set.
@@ -145,30 +146,32 @@ async function getModuleReplacements(): Promise<ModuleReplacement[]> {
 }
 
 async function fetchDocumentedDocs(docPath: string) {
-  let markdown = await fetchText(
-    `https://api.github.com/repos/es-tooling/module-replacements/contents/docs/modules/${docPath}.md`,
-    {
+  return cacheResult(`fetchDocumentedDocs:${docPath}`, 120, async () => {
+    let markdown = await fetchText(
+      `https://api.github.com/repos/es-tooling/module-replacements/contents/docs/modules/${docPath}.md`,
+      {
+        headers: {
+          Accept: 'application/vnd.github.raw+json',
+          'X-GitHub-Api-Version': '2022-11-28',
+        },
+      },
+    )
+    // Delete initial content until after the first heading ended
+    markdown = markdown.replace(/^([\s\S]*?\n)# .+?\n/, '')
+
+    const html = await fetchText('https://api.github.com/markdown', {
+      method: 'POST',
       headers: {
-        Accept: 'application/vnd.github.raw+json',
+        Accept: 'text/html',
         'X-GitHub-Api-Version': '2022-11-28',
       },
-    },
-  )
-  // Delete initial content until after the first heading ended
-  markdown = markdown.replace(/^([\s\S]*?\n)# .+?\n/, '')
+      body: JSON.stringify({
+        text: markdown,
+        mode: 'gfm',
+        context: 'es-tooling/module-replacements',
+      }),
+    })
 
-  const html = await fetchText('https://api.github.com/markdown', {
-    method: 'POST',
-    headers: {
-      Accept: 'text/html',
-      'X-GitHub-Api-Version': '2022-11-28',
-    },
-    body: JSON.stringify({
-      text: markdown,
-      mode: 'gfm',
-      context: 'es-tooling/module-replacements',
-    }),
+    return html
   })
-
-  return html
 }
