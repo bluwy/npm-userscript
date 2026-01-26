@@ -21,22 +21,37 @@ export interface PackageFilesDataFile {
 }
 
 export async function getFullRepositoryLink(): Promise<string | undefined> {
-  const repositoryLink = getNpmContext().context.packument.repository
-  if (!repositoryLink) return
+  const repository = getNpmContext().context.packument.repository
+  if (!repository) return
 
   const packageJson = await fetchPackageJson()
   const directory = packageJson?.repository?.directory
-  if (!directory) return
+  if (!directory) return repository
 
-  let fullRepositoryLink = repositoryLink
-  if (!/\/tree\/.+$/.test(repositoryLink)) {
+  return getRepositoryFilePath(directory)
+}
+
+export async function getRepositoryFilePath(filePath: string): Promise<string | undefined> {
+  const repository = getNpmContext().context.packument.repository
+  if (!repository) return
+
+  let repositoryFilePath = repository
+  if (!/\/tree\/.+$/.test(repository)) {
     // Append /tree/<default_branch>/ if no branch is specified
     const repoData = await fetchGitHubRepoData()
     if (!repoData) return
-    fullRepositoryLink += `/tree/${repoData.default_branch}`
+    repositoryFilePath += `/tree/${repoData.default_branch}`
   }
-  fullRepositoryLink += `/${directory.replace(/^\/+/, '')}`
-  return fullRepositoryLink
+  if (repositoryFilePath.endsWith('/')) {
+    repositoryFilePath = repositoryFilePath.slice(0, -1)
+  }
+  if (filePath.startsWith('/')) {
+    filePath = filePath.slice(1)
+  }
+  if (filePath) {
+    repositoryFilePath += `/${filePath}`
+  }
+  return repositoryFilePath
 }
 
 export async function fetchPackageFilesData(): Promise<PackageFilesData | undefined> {
@@ -138,6 +153,24 @@ export function fetchHeaders(
           // @ts-expect-error untyped
           req.abort()
           resolve(response.responseHeaders)
+        }
+      },
+    })
+  })
+}
+
+export function fetchStatus(
+  input: string | URL | Request,
+  init?: FetchRequestInit,
+): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const req = GM.xmlHttpRequest({
+      ...getSharedOptions(input, init, reject),
+      onreadystatechange: (response) => {
+        if (response.readyState === 2) {
+          // @ts-expect-error untyped
+          req.abort()
+          resolve(response.status)
         }
       },
     })

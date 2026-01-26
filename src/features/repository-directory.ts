@@ -24,6 +24,7 @@ export async function run() {
 
   const fullRepositoryLink = await getFullRepositoryLink()
   if (!fullRepositoryLink) return
+  if (el.href === fullRepositoryLink) return
 
   el.href = fullRepositoryLink
   textEl.textContent = fullRepositoryLink.replace(/^https?:\/\//, '')
