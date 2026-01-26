@@ -15,7 +15,7 @@ export const handler: RouteHandler = async (request, env, ctx) => {
   const cacheKey = `${url.origin}${url.pathname}`
   const cache = caches.default
 
-  let cachedResponse = await cache.match(cacheKey)
+  const cachedResponse = await cache.match(cacheKey)
   if (cachedResponse) {
     return cachedResponse
   }
@@ -36,44 +36,57 @@ export const handler: RouteHandler = async (request, env, ctx) => {
     filtered = { vulns: [] }
   } else {
     try {
+      // Pre-compute published timestamp for sorting
+      for (const vuln of json.vulns) {
+        vuln._publishedTimestamp = new Date(vuln.published).getTime()
+      }
       filtered = {
-        vulns: json.vulns.map((vuln: any) => {
-          const cvssVector = vuln.severity[0].score
-          const cvss = fromVector(cvssVector)
-          const score = cvss.calculateScores().overall
+        vulns: json.vulns
+          // Sort by published date. OSV sorts by modified date by default
+          .sort((a: any, b: any) => b._publishedTimestamp - a._publishedTimestamp)
+          .map((vuln: any) => {
+            // Skip not credible sources
+            if (vuln.references.find((ref: any) => ref.url.includes('https://www.herodevs.com')))
+              return
 
-          // Try to get the CVE- prefix name if possible
-          const id = vuln.aliases?.find((a: string) => a.startsWith('CVE-')) ?? vuln.id
-          // Try to get the link that contains the id first, then the specific ADVISORY type, else the first
-          const link = (
-            vuln.references.find((ref: any) => ref.url.includes(id)) ??
-            vuln.references.find((ref: any) => ref.type === 'ADVISORY') ??
-            vuln.references[0]
-          ).url
+            const cvssVector = vuln.severity[0].score
+            const cvss = fromVector(cvssVector)
+            const score = cvss.calculateScores().overall
 
-          return {
-            id,
-            link,
-            score,
-            affected: vuln.affected.flatMap((aff: any) => {
-              if (aff.package.name !== packageName) return []
-              const arr = []
-              for (const range of aff.ranges) {
-                if (range.type === 'SEMVER') {
-                  const introduced = range.events.find((e: any) => e.introduced)?.introduced
-                  const fixed = range.events.find((e: any) => e.fixed)?.fixed
-                  if (introduced && fixed) {
-                    arr.push([introduced, fixed])
+            // Try to get the CVE- prefix name if possible
+            const id = vuln.aliases?.find((a: string) => a.startsWith('CVE-')) ?? vuln.id
+            // Get the link in this preferred order
+            const link = (
+              vuln.references.find((ref: any) => ref.url.includes(vuln.id)) ??
+              vuln.references.find((ref: any) => ref.url.includes(id)) ??
+              vuln.references.find((ref: any) => ref.type === 'ADVISORY') ??
+              vuln.references[0]
+            ).url
+
+            return {
+              id,
+              link,
+              score,
+              affected: vuln.affected.flatMap((aff: any) => {
+                if (aff.package.name !== packageName) return []
+                const arr = []
+                for (const range of aff.ranges) {
+                  if (range.type === 'SEMVER') {
+                    const introduced = range.events.find((e: any) => e.introduced)?.introduced
+                    const fixed = range.events.find((e: any) => e.fixed)?.fixed
+                    if (introduced && fixed) {
+                      arr.push([introduced, fixed])
+                    }
                   }
                 }
-              }
-              return arr
-            }),
-          }
-        }),
+                return arr
+              }),
+            }
+          })
+          .filter(Boolean),
       }
     } catch (e) {
-      console.error('Error processing data', e, json)
+      // console.error('Error processing data', e, json)
       return new Response('Error processing data', { status: 500 })
     }
   }
