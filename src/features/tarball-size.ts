@@ -1,5 +1,11 @@
-import { fetchHeaders } from '../utils-fetch.ts'
-import { getNpmTarballUrl, isSamePackagePage, isValidPackagePage, prettyBytes } from '../utils.ts'
+import { fetchText } from '../utils-fetch.ts'
+import {
+  getPackageName,
+  getPackageVersion,
+  isSamePackagePage,
+  isValidPackagePage,
+  prettyBytes,
+} from '../utils.ts'
 
 export const description = `\
 Display the tarball size of the package.
@@ -31,15 +37,11 @@ export async function run() {
 }
 
 async function getTarballSize(): Promise<string | undefined> {
-  const tarballUrl = getNpmTarballUrl()
-  if (!tarballUrl) return undefined
-
-  const result = await fetchHeaders(tarballUrl)
-
-  const contentLength = /content-length:\s*(\d+)/.exec(result)?.[1]
-  if (!contentLength) return undefined
-
-  return prettyBytes(parseInt(contentLength, 10))
+  const packageName = getPackageName()
+  const packageVersion = getPackageVersion()
+  if (!packageName || !packageVersion) return
+  const size = await fetchText(`${API_URL}/packed-size/${packageName}@${packageVersion}`)
+  return prettyBytes(parseInt(size, 10))
 }
 
 async function getColumnToInsertAfter() {

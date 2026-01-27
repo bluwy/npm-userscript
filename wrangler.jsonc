@@ -7,4 +7,10 @@
   "observability": {
     "enabled": true,
   },
+  "kv_namespaces": [
+    {
+      "binding": "NPM_PACKED_SIZE",
+      "id": "ffc20fbd1a5a4831ae74638099c29ca3",
+    },
+  ],
 }

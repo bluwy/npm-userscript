@@ -26,6 +26,7 @@
   "dependencies": {
     "@floating-ui/dom": "^1.7.4",
     "ae-cvss-calculator": "^1.0.9",
+    "get-npm-tarball-url": "^2.1.0",
     "semver": "^7.7.3",
     "uhtml": "^5.0.9"
   },

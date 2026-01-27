@@ -1,7 +1,8 @@
+import * as packedSize from './routes/packed-size.ts'
 import * as vulnerabilities from './routes/vulnerabilities.ts'
 import type { RouteHandler } from './types.ts'
 
-const routes: { handler: RouteHandler }[] = [vulnerabilities]
+const routes: { handler: RouteHandler }[] = [packedSize, vulnerabilities]
 
 export default {
   async fetch(request, env, ctx): Promise<Response> {

@@ -85,12 +85,6 @@ export function getGitHubOwnerRepo(): string | undefined {
   return /github\.com\/([^\/]+\/[^\/]+)/.exec(repositoryLink)?.[1]
 }
 
-export function getNpmTarballUrl() {
-  const packument = getNpmContext().context.packument
-  const versionData = packument.versions.find((v: any) => v.version === packument.version)
-  return versionData.dist.tarball as string
-}
-
 export function prettyBytes(bytes: number): string {
   if (bytes < 1000) return `${bytes} B`
   // NOTE: We use lowercase-k and uppercase for the rest to follow npmjs.com style.
