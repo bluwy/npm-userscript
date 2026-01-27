@@ -29,11 +29,12 @@ export const handler: RouteHandler = async (request, env, ctx) => {
     signal: abortController.signal,
   })
   const contentLength = result.headers.get('content-length')
+  const isOk = result.ok
   await result.body?.cancel()
   abortController.abort()
   const size = contentLength ? parseInt(contentLength, 10) : undefined
 
-  if (size === undefined || isNaN(size)) {
+  if (!isOk || size === undefined || isNaN(size)) {
     return new Response('Could not determine package size', { status: 500 })
   }
   const sizeStr = size.toString()
