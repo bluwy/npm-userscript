@@ -164,12 +164,11 @@ export function fetchStatus(
   init?: FetchRequestInit,
 ): Promise<number> {
   return new Promise((resolve, reject) => {
-    const req = GM.xmlHttpRequest({
+    GM.xmlHttpRequest({
       ...getSharedOptions(input, init, reject),
+      method: 'HEAD',
       onreadystatechange: (response) => {
         if (response.readyState === 2) {
-          // @ts-expect-error untyped
-          req.abort()
           resolve(response.status)
         }
       },
