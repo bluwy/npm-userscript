@@ -2,9 +2,9 @@
 
 Various improvements and fixes for npmjs.com. [Install on Greasyfork](https://greasyfork.org/en/scripts/559139-npm-userscript).
 
-|                                                Before                                                |                                                After                                                |
-| :--------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------: |
-| ![npmjs.com before](https://github.com/user-attachments/assets/4ecd020f-ec09-4449-b348-ad9da6a8075b) | ![npmjs.com after](https://github.com/user-attachments/assets/161af209-8b55-47c8-ab51-cef81df3336a) |
+**Before:** ![npmjs.com before](https://github.com/user-attachments/assets/4ecd020f-ec09-4449-b348-ad9da6a8075b)
+
+**After:** ![npmjs.com after](https://github.com/user-attachments/assets/161af209-8b55-47c8-ab51-cef81df3336a)
 
 Additional demos:
 
@@ -46,7 +46,7 @@ Additional demos:
 ## Disclaimer
 
 1. As npm updates their site, some features may break or behave unexpectedly until the userscript is updated accordingly. Please be aware especially when updating sensitive data.
-2. The userscript fetches from https://npm-userscript.bjornlu.workers.dev (a custom Cloudflare Worker) that proxies data from other sources to save on bandwidth. Check the [worker](./worker/) directory for the source code.
+2. The userscript fetches from https://npm-userscript.bjornlu.workers.dev (a custom Cloudflare Worker) that proxies data from other sources to save on bandwidth and cache results. Check the [worker](./worker/) directory for the source code.
 
 ## Sponsors
 
