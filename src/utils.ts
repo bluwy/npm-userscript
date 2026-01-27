@@ -87,7 +87,7 @@ export function getGitHubOwnerRepo(): string | undefined {
 
 export function getNpmTarballUrl() {
   const packument = getNpmContext().context.packument
-  const versionData = packument.versions.find((v: any) => (v.version = packument.version))
+  const versionData = packument.versions.find((v: any) => v.version === packument.version)
   return versionData.dist.tarball as string
 }
 
