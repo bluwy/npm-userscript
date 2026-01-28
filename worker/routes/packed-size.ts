@@ -1,5 +1,6 @@
 import getNpmTarballUrl from 'get-npm-tarball-url'
 import type { RouteHandler } from '../types.ts'
+import { userAgentHeader } from '../utils.ts'
 
 export const handler: RouteHandler = async (request, env, ctx) => {
   const url = new URL(request.url)
@@ -27,6 +28,7 @@ export const handler: RouteHandler = async (request, env, ctx) => {
   const abortController = new AbortController()
   const result = await fetch(getNpmTarballUrl(packageName, packageVersion), {
     signal: abortController.signal,
+    headers: userAgentHeader,
   })
   const contentLength = result.headers.get('content-length')
   const isOk = result.ok

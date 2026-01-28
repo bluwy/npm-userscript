@@ -1,5 +1,6 @@
 import { fromVector } from 'ae-cvss-calculator'
 import type { RouteHandler } from '../types.ts'
+import { userAgentHeader } from '../utils.ts'
 
 // The osv.dev API seems to update around every 15 minutes, so we also cache for that duration
 const CACHE_TTL = 15 * 60
@@ -22,6 +23,7 @@ export const handler: RouteHandler = async (request, env, ctx) => {
 
   const result = await fetch('https://api.osv.dev/v1/query', {
     method: 'POST',
+    headers: userAgentHeader,
     body: JSON.stringify({
       package: {
         name: packageName,
