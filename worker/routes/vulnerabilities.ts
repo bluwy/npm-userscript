@@ -45,10 +45,6 @@ export const handler: RouteHandler = async (request, env, ctx) => {
           // Sort by published date. OSV sorts by modified date by default
           .sort((a: any, b: any) => b._publishedTimestamp - a._publishedTimestamp)
           .map((vuln: any) => {
-            // Skip not credible sources
-            if (vuln.references.find((ref: any) => ref.url.includes('https://www.herodevs.com')))
-              return
-
             const cvssVector = vuln.severity[0].score
             const cvss = fromVector(cvssVector)
             const score = cvss.calculateScores().overall
@@ -73,9 +69,21 @@ export const handler: RouteHandler = async (request, env, ctx) => {
                 for (const range of aff.ranges) {
                   if (range.type === 'SEMVER') {
                     const introduced = range.events.find((e: any) => e.introduced)?.introduced
+                    if (!introduced) continue
                     const fixed = range.events.find((e: any) => e.fixed)?.fixed
-                    if (introduced && fixed) {
+                    if (fixed) {
                       arr.push([introduced, fixed])
+                      break
+                    }
+                    // NOTE: This is added later, so older versions of the userscript may still
+                    // treat this as exclusive-end, but that's ok for now. It will miss reporting
+                    // vulnerabilities for one version.
+                    const lastAffected = range.events.find(
+                      (e: any) => e.last_affected,
+                    )?.last_affected
+                    if (lastAffected) {
+                      arr.push([introduced, lastAffected, 'i']) // inclusive-end
+                      break
                     }
                   }
                 }

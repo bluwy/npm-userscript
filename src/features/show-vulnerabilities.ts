@@ -1,5 +1,6 @@
 import semverGte from 'semver/functions/gte.js'
 import semverLt from 'semver/functions/lt.js'
+import semverLte from 'semver/functions/lte.js'
 import semverMaxSatisfying from 'semver/ranges/max-satisfying.js'
 import { fetchJson } from '../utils-fetch.ts'
 import { getNpmContext } from '../utils-npm-context.ts'
@@ -25,7 +26,7 @@ interface Vulnerability {
   id: string
   link: string
   score: number
-  affected: [string, string][]
+  affected: ([string, string] | [string, string, 'i'])[]
 }
 
 export function teardown(previousUrl: string) {
@@ -58,6 +59,7 @@ export function runPre() {
       top: 0;
       left: 0;
       background: var(--background-color);
+      color: black;
       font-size: 90%;
       padding: 4px 8px;
       border-radius: 4px;
@@ -187,9 +189,17 @@ function getVulnerabilitiesForVersion(
   const matched: Vulnerability[] = []
   for (const vuln of vulnerabilities) {
     for (const affected of vuln.affected) {
-      if (semverGte(version, affected[0]) && semverLt(version, affected[1])) {
-        matched.push(vuln)
-        break
+      if (affected[2] === 'i') {
+        // inclusive-end
+        if (semverGte(version, affected[0]) && semverLte(version, affected[1])) {
+          matched.push(vuln)
+          break
+        }
+      } else {
+        if (semverGte(version, affected[0]) && semverLt(version, affected[1])) {
+          matched.push(vuln)
+          break
+        }
       }
     }
   }
