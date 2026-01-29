@@ -1,7 +1,7 @@
 {
   "name": "npm-userscript",
   "private": true,
-  "version": "0.3.5",
+  "version": "0.3.6",
   "author": "Bjorn Lu",
   "license": "MIT",
   "description": "Various improvements and fixes for npmjs.com",
