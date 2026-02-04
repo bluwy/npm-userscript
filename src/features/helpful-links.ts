@@ -62,6 +62,7 @@ export async function run() {
     await getRepoLinkData(),
     getHomepageLinkData(),
     getFundingLinkData(),
+    getNpmxLinkData(packageName),
     getPublintLinkData(packageName),
     getAttwLinkData(packageName),
     getNpmgraphLinkData(packageName),
@@ -127,6 +128,14 @@ function getFundingLinkData(): LinkData | undefined {
       url: fundingLink,
       iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-hidden="true"><path fill="#fa5b9b" d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"></path></svg>`,
     }
+  }
+}
+
+function getNpmxLinkData(packageName: string): LinkData {
+  return {
+    label: 'Open in npmx',
+    url: `https://npmx.dev/package/${packageName}`,
+    iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0a0a0a" rx="64"/><path fill="#525252" d="M110 310h60v60h-60z"/><text x="320" y="370" fill="#fafafa" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace" font-size="420" font-weight="500" text-anchor="middle"><tspan>/</tspan></text></svg>`,
   }
 }
 
