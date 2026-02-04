@@ -8,7 +8,7 @@ versions, and fix provenance icon alignment.
 
 interface VersionInfo {
   totalDownloads: number
-  lastPublished: string
+  lastPublished: { ts: number; rel: string }
 }
 
 export function runPre() {
@@ -144,21 +144,15 @@ function addCumulatedVersionsTable() {
     const major = version.split('.')[0]
     const minor = version.split('.').slice(0, 2).join('.')
     const downloads = npmContext.context.versionsDownloads[version] || 0
-    const publishedText = entry.date.rel
+    const lastPublished = entry.date
 
     if (!majorToInfo[major]) {
-      majorToInfo[major] = {
-        totalDownloads: 0,
-        lastPublished: publishedText,
-      }
+      majorToInfo[major] = { totalDownloads: 0, lastPublished }
     }
     majorToInfo[major].totalDownloads += downloads
 
     if (!minorToInfo[minor]) {
-      minorToInfo[minor] = {
-        totalDownloads: 0,
-        lastPublished: publishedText,
-      }
+      minorToInfo[minor] = { totalDownloads: 0, lastPublished }
     }
     minorToInfo[minor].totalDownloads += downloads
   }
@@ -169,14 +163,21 @@ function addCumulatedVersionsTable() {
   const keys = Object.keys(majorToInfo).sort((a, b) => parseInt(b) - parseInt(a))
   for (const major of keys) {
     const majorInfo = majorToInfo[major]
+    const majorDate = new Date(majorInfo.lastPublished.ts)
 
     // The major tbody that can be toggled to show minor versions
     const majorTbody = document.createElement('tbody')
     majorTbody.innerHTML = `
       <tr>
-        <td style="cursor: pointer;"><span class="f5 black-80 lh-copy code">${major}.x</span></td>
+        <td style="cursor: pointer;">
+          <span class="f5 black-80 lh-copy code">${major}.x</span>
+        </td>
         <td>${majorInfo.totalDownloads.toLocaleString()}</td>
-        <td>${majorInfo.lastPublished}</td>
+        <td class="f5 black-60 lh-copy">
+          <time datetime="${majorDate.toISOString()}" title="${majorDate.toLocaleString()}">
+            ${majorInfo.lastPublished.rel}
+          </time>
+        </td>
       </tr>
     `
 
@@ -192,11 +193,16 @@ function addCumulatedVersionsTable() {
       })
     for (const minor of minorKeys) {
       const minorInfo = minorToInfo[minor]
+      const minorDate = new Date(minorInfo.lastPublished.ts)
       minorTbody.innerHTML += `
         <tr>
           <td><span class="f6 black-80 code ml3">${minor}.x</span></td>
           <td class="o-80">${minorInfo.totalDownloads.toLocaleString()}</td>
-          <td class="o-80">${minorInfo.lastPublished}</td>
+          <td class="o-80 f5 black-60 lh-copy">
+            <time datetime="${minorDate.toISOString()}" title="${minorDate.toLocaleString()}">
+              ${minorInfo.lastPublished.rel}
+            </time>
+          </td>
         </tr>
       `
     }
