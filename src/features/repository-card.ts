@@ -47,7 +47,6 @@ export function runPre() {
     
     .npm-userscript-repository-card-title-repo {
       font-weight: bold;
-      text-wrap: nowrap;
     }
 
     .npm-userscript-repository-card-title-directory {

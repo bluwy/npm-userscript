@@ -81,6 +81,8 @@ export function cacheResult<T>(
 
   if (duration > 0) {
     const cached = cache.get(key)
+    // If `fn` returns undefined, we should return undefined instead of parsing (which errors).
+    if (cached === undefined) return undefined as T
     if (cached !== null) return JSON.parse(cached) as T
   }
 
