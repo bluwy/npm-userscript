@@ -19,6 +19,10 @@ export function addPackageLabelStyle() {
     button.npm-userscript-package-label {
       cursor: pointer;
     }
+    .npm-userscript-package-label a {
+      color: inherit;
+      text-decoration: underline;
+    }
     .npm-userscript-package-label-info {
       color: #004085;
       background-color: #cce5ff;
