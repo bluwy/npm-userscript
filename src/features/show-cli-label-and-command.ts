@@ -9,7 +9,7 @@ import {
 } from '../utils.ts'
 
 export const description = `\
-Adds a label if the package ships a CLI via the package.json "bin" field, and update the install
+Adds a label if the package publishes a CLI via the package.json "bin" field, and update the install
 command to "npm create" or "npx" accordingly.
 `
 
@@ -51,7 +51,7 @@ export async function run() {
 
   const label = addPackageLabel('show-cli-label-and-command', 'CLI')
   label.classList.add('npm-userscript-types-label')
-  label.title = `This package ships the ${binNames.map((n) => `"${n}"`).join(', ')} command`
+  label.title = `This package publishes the ${binNames.map((n) => `"${n}"`).join(', ')} command`
 
   if (!packageJson.main && !packageJson.exports && !packageJson.browser && !packageJson.module) {
     const atVersion = isLatest ? '' : `@${packageVersion}`

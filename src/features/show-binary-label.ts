@@ -3,7 +3,7 @@ import { addPackageLabel, addPackageLabelStyle } from '../utils-ui.ts'
 import { isSamePackagePage, isValidPackagePage } from '../utils.ts'
 
 export const description = `\
-Adds a label for packages that ship prebuilt native binaries.
+Adds a label for packages that publish prebuilt native binaries.
 `
 
 const popularOs = ['linux', 'darwin', 'win32']
@@ -27,10 +27,10 @@ export async function run() {
   const packageJson = await fetchPackageJson()
   if (!packageJson) return
 
-  if (shipsNativeBinaries(packageJson)) {
+  if (publishesNativeBinaries(packageJson)) {
     const label = addPackageLabel('show-binary-label', 'Has binaries')
     label.classList.add('npm-userscript-binary-label')
-    label.title = 'This package ships prebuilt native binaries via optional dependencies'
+    label.title = 'This package publishes prebuilt native binaries via optional dependencies'
     return
   }
 
@@ -38,16 +38,16 @@ export async function run() {
   if (nativeInfo) {
     const label = addPackageLabel('show-binary-label', `${nativeInfo} binary`)
     label.classList.add('npm-userscript-binary-label')
-    label.title = `This package ships prebuilt native binary for ${nativeInfo}`
+    label.title = `This package publishes prebuilt native binary for ${nativeInfo}`
   }
 }
 
-function shipsNativeBinaries(packageJson: Record<string, any>): boolean {
+function publishesNativeBinaries(packageJson: Record<string, any>): boolean {
   const optionalDependencies = Object.keys(packageJson.optionalDependencies || {})
   if (optionalDependencies.length <= 0) return false
 
   // Check "os" and "cpu" fields, if there's at least two matching popular ones, consider it is an
-  // npm package shipping native binaries
+  // npm package publishing native binaries
   let matchCount = 0
   for (const dep of optionalDependencies) {
     if (

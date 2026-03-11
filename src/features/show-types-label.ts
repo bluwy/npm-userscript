@@ -4,8 +4,8 @@ import { addPackageLabel, addPackageLabelStyle } from '../utils-ui.ts'
 import { addStyle, getPackageName, isSamePackagePage, isValidPackagePage } from '../utils.ts'
 
 export const description = `\
-Adds a label for packages that ship types. This is similar to npm's own DT / TS icon but
-with a more consistent UI. It is also more accurate if the package ship types but isn't detectable
+Adds a label for packages that publish TypeScript types. This is similar to npm's own DT / TS icon but
+with a more consistent UI. It is also more accurate if the package publishes types but isn't detectable
 in the package.json.
 `
 
@@ -38,7 +38,7 @@ export async function run() {
   const typesInfo = parseNpmTypes()
 
   if (typesInfo.type === 'none') {
-    // Npm might not detect this correctly. We check from its shipped files instead.
+    // Npm might not detect this correctly. We check from its published files instead.
     const data = await fetchPackageFilesData()
     if (
       Object.keys(data?.files ?? {}).some(
@@ -48,7 +48,7 @@ export async function run() {
       typesInfo.type = 'bundled'
     }
     // Additionally, maybe this package intentionally does not have types because it's not
-    // shipping any JS files
+    // publishing any JS files
     else {
       // Check the main and exports field recursively for values that end with .js, .mjs, and .cjs
       const packageJson = await fetchPackageJson()
@@ -71,10 +71,10 @@ export async function run() {
   let label: HTMLElement | undefined
   if (typesInfo.type === 'none') {
     label = addPackageLabel('show-types-label', 'Untyped', 'warning')
-    label.title = 'This package does not ship TypeScript types'
+    label.title = 'This package does not publish TypeScript types'
   } else if (typesInfo.type === 'bundled') {
     label = addPackageLabel('show-types-label', 'DTS')
-    label.title = 'This package ships TypeScript types'
+    label.title = 'This package publishes TypeScript types'
   } else if (typesInfo.type === 'package') {
     label = addPackageLabel(
       'show-types-label',
