@@ -96,17 +96,10 @@ export async function fetchGitHubPullRequestsCount(): Promise<number | undefined
   const ownerRepo = getGitHubOwnerRepo()
   if (!ownerRepo) return undefined
   return cacheResult(`fetchPrCount:${ownerRepo}`, 60, async () => {
-    const headers = await fetchHeaders(`https://api.github.com/repos/${ownerRepo}/pulls?per_page=1`)
-    // Example header:
-    // ...
-    // Link: <https://api.github.com/repositories/74293321/pulls?per_page=1&page=2>; rel="next", <https://api.github.com/repositories/74293321/pulls?per_page=1&page=75>; rel="last"
-    // ...
-    // Fetch the last page= number
-    const match =
-      /<https:\/\/api\.github\.com\/repositories\/\d+\/pulls\?per_page=1&page=(\d+)>;\s*rel="last"/.exec(
-        headers,
-      )
-    return match ? Number(match[1]) : 0
+    const result = await fetchJson(
+      `https://api.github.com/search/issues?q=repo:${ownerRepo}+type:pr+state:open&per_page=1`,
+    )
+    return result.total_count
   })
 }
 
@@ -136,24 +129,6 @@ export function fetchJson<T = any>(
       responseType: 'json',
       onload: (response) => {
         resolve(response.response as T)
-      },
-    })
-  })
-}
-
-export function fetchHeaders(
-  input: string | URL | Request,
-  init?: FetchRequestInit,
-): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const req = GM.xmlHttpRequest({
-      ...getSharedOptions(input, init, reject),
-      onreadystatechange: (response) => {
-        if (response.readyState === 2) {
-          // @ts-expect-error untyped
-          req.abort()
-          resolve(response.responseHeaders)
-        }
       },
     })
   })
