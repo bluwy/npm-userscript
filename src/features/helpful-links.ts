@@ -70,6 +70,7 @@ export async function run() {
     getPublintLinkData(packageName),
     getAttwLinkData(packageName),
     getNpmgraphLinkData(packageName),
+    getPkgSizeLinkData(packageName),
     getNodeModulesInspectorLinkData(packageName),
     getPackagephobiaLinkData(packageName),
     getBundlejsLinkData(packageName),
@@ -164,6 +165,14 @@ function getNpmgraphLinkData(packageName: string): LinkData {
     label: 'Check with Npmgraph',
     url: `https://npmgraph.js.org/?q=${packageName}`,
     iconSvg: `<svg class="dark-invert" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 8.467 8.467" aria-hidden="true"><defs><radialGradient xlink:href="#a" id="b" cx=".794" cy="3.572" r="1.323" fx=".794" fy="3.572" gradientTransform="matrix(1.4 0 0 .8 -.317 1.111)" gradientUnits="userSpaceOnUse"/><radialGradient xlink:href="#a" id="c" cx=".794" cy="3.572" r="1.323" fx=".794" fy="3.572" gradientTransform="matrix(1.4 0 0 .8 4.974 -2.328)" gradientUnits="userSpaceOnUse"/><radialGradient xlink:href="#a" id="d" cx=".794" cy="3.572" r="1.323" fx=".794" fy="3.572" gradientTransform="matrix(1.4 0 0 .8 4.974 .053)" gradientUnits="userSpaceOnUse"/><radialGradient xlink:href="#a" id="f" cx=".794" cy="3.572" r="1.323" fx=".794" fy="3.572" gradientTransform="matrix(1.4 0 0 .8 4.974 4.55)" gradientUnits="userSpaceOnUse"/><radialGradient xlink:href="#a" id="e" cx=".794" cy="3.572" r="1.323" fx=".794" fy="3.572" gradientTransform="matrix(1.4 0 0 .8 4.974 2.17)" gradientUnits="userSpaceOnUse"/><linearGradient id="a"><stop offset="0" style="stop-color:#fff;stop-opacity:1"/><stop offset="1" style="stop-color:#a4a4a4;stop-opacity:1"/></linearGradient></defs><rect width="2.381" height=".794" x=".397" y="3.836" rx=".282" ry=".282" style="fill:url(#b);stroke:#000;stroke-width:.264584;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;fill-opacity:1"/><path d="M2.891 4.233c1.047.045.558-3.44 2.136-3.44" style="fill:none;stroke:#000;stroke-width:.264583;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/><path d="m5.027.265.546.557-.546.5ZM5.027 2.646l.546.558-.546.5ZM5.027 4.762l.546.558-.546.5ZM5.027 7.144l.546.558-.546.5Z" style="fill:#000;stroke:none;stroke-width:.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"/><path d="M2.91 4.233c1.048.045.539-1.058 2.117-1.058" style="fill:none;stroke:#000;stroke-width:.264583;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/><path d="M2.891 4.233c1.047-.044.558 3.44 2.136 3.44" style="fill:none;stroke:#000;stroke-width:.264583;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/><path d="M2.91 4.233c1.048-.044.539 1.059 2.117 1.059" style="fill:none;stroke:#000;stroke-width:.264583;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/><rect width="2.381" height=".794" x="5.689" y=".397" rx=".282" ry=".282" style="fill:url(#c);fill-opacity:1;stroke:#000;stroke-width:.264583;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"/><rect width="2.381" height=".794" x="5.689" y="2.778" rx=".282" ry=".282" style="fill:url(#d);fill-opacity:1;stroke:#000;stroke-width:.264583;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"/><rect width="2.381" height=".794" x="5.689" y="4.895" rx=".282" ry=".282" style="fill:url(#e);fill-opacity:1;stroke:#000;stroke-width:.264583;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"/><rect width="2.381" height=".794" x="5.689" y="7.276" rx=".282" ry=".282" style="fill:url(#f);fill-opacity:1;stroke:#000;stroke-width:.264583;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"/></svg>`,
+  }
+}
+
+function getPkgSizeLinkData(packageName: string): LinkData {
+  return {
+    label: 'Check with pkg-size',
+    url: `https://pkg-size.dev/${packageName}`,
+    iconSvg: `<svg width="1.2em" height="1.2em" viewBox="0 0 24 24"><g fill="none" stroke="#ff7251" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14M7.5 4.27l9 5.15"/><path d="M3.29 7 12 12l8.71-5M12 22V12"/><circle cx="18.5" cy="15.5" r="2.5"/><path d="M20.27 17.27 22 19"/></g></svg>`,
   }
 }
 
