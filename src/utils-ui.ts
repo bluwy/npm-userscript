@@ -38,6 +38,21 @@ export function addPackageLabelStyle() {
       background-color: #f8d7da;
       border-color: #f5c6cb;
     }
+    html[data-color-mode="dark"] .npm-userscript-package-label-info {
+      color: #cce5ff;
+      background-color: #004085;
+      border-color: #7f9bb1;
+    }
+    html[data-color-mode="dark"] .npm-userscript-package-label-warning {
+      color: #ffe76a;
+      background-color: #856404;
+      border-color: #a8943f;
+    }
+    html[data-color-mode="dark"] .npm-userscript-package-label-error {
+      color: #f8d7da;
+      background-color: #721c24;
+      border-color: #b08f94;
+    }
   `)
 }
 

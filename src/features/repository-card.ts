@@ -30,7 +30,7 @@ export function runPre() {
 
   addStyle(`
     .npm-userscript-repository-card {
-      border: 1px solid #cccccc;
+      border: 1px solid var(--color-border-default);
       border-radius: 5px;
       padding: 10px;
       margin-top: 14px;

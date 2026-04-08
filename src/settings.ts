@@ -51,7 +51,7 @@ function Settings() {
   )
 
   return html`
-    <div id="npm-userscript-settings" @click=${(e: Event) => (e.currentTarget as HTMLElement).remove()}> }>
+    <div id="npm-userscript-settings" @click=${(e: Event) => (e.currentTarget as HTMLElement).remove()}>
       <style>
         #npm-userscript-settings {
           position: fixed;
