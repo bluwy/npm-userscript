@@ -76,7 +76,7 @@ export async function run() {
     getBundlejsLinkData(packageName),
   ].filter(Boolean) as LinkData[]
 
-  const injectParent = document.querySelector('#top > div:first-child')
+  const injectParent = document.querySelector('#top > div:has(h1)')
   if (!injectParent) return
 
   const group = injectParent.lastElementChild!.cloneNode() as HTMLElement
