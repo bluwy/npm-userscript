@@ -65,6 +65,25 @@ export function runPre() {
         margin-bottom: 0;
       }
     `)
+
+    // Fix dark mode deprecation color contrast
+    addStyle(`
+      html[data-color-mode="dark"] #top > div:first-child.bg-washed-red.b--black-10,
+      html[data-color-mode="dark"] #top > div:first-child.bg-washed-red .b--black-10 {
+        color: #262626 !important;
+      }
+
+      html[data-color-mode="dark"] #top > div:first-child code {
+        color: var(--color-fg-default);
+      }
+    `)
+
+    // Fix dark mode readme code block color contrast
+    addStyle(`
+      html[data-color-mode="dark"] .highlight .pl-s {
+        color: #98c379;
+      }
+    `)
   }
 
   if (/^\/settings\/.+?\/members/.test(location.pathname)) {
