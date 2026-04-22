@@ -80,6 +80,18 @@ export function runPre() {
       display: table-row-group;
     }
   `)
+
+  // Make border lighter in dark mode
+  addStyle(`
+    html[data-color-mode="dark"] table[aria-labelledby="current-tags"] thead th,
+    html[data-color-mode="dark"] table[aria-labelledby="current-tags"] tbody td,
+    html[data-color-mode="dark"] table[aria-labelledby="cumulated-versions"] thead th,
+    html[data-color-mode="dark"] table[aria-labelledby="cumulated-versions"] tbody td,
+    html[data-color-mode="dark"] table[aria-labelledby="version-history"] thead th,
+    html[data-color-mode="dark"] table[aria-labelledby="version-history"] tbody td {
+      border-color: var(--color-border-default);
+    }
+  `)
 }
 
 export function run() {

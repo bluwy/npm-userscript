@@ -53,7 +53,7 @@ export function runPre() {
       font-weight: bold;
       color: #757575;
       text-wrap: nowrap;
-      overflow-x: hidden;
+      overflow: hidden;
       text-overflow: ellipsis;
     }
     
@@ -83,7 +83,6 @@ export function runPre() {
     .npm-userscript-repository-card a:focus,
     .npm-userscript-repository-card a:hover {
       text-decoration: underline;
-      color: #cb3837;
     }
   `)
 

@@ -99,6 +99,26 @@ export function runPre() {
       }
     `)
   }
+
+  if (location.pathname === '/') {
+    addStyle(`
+      ul[aria-labelledby="discover-packages-header"] {
+        gap: 10px;
+      }
+
+      ul[aria-labelledby="discover-packages-header"] li {
+        display: block;
+        flex: unset;
+        width: calc(50% - 5px);
+        margin: 0;
+      }
+
+      ul[aria-labelledby="discover-packages-header"] a {
+        padding-left: 0;
+        padding-right: 0;
+      }
+    `)
+  }
 }
 
 export function run() {
