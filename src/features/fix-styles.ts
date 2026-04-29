@@ -77,13 +77,6 @@ export function runPre() {
         color: var(--color-fg-default);
       }
     `)
-
-    // Fix dark mode readme code block color contrast
-    addStyle(`
-      html[data-color-mode="dark"] .highlight .pl-s {
-        color: #98c379;
-      }
-    `)
   }
 
   if (/^\/settings\/.+?\/members/.test(location.pathname)) {

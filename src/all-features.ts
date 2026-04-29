@@ -1,5 +1,6 @@
 import * as betterDependencies from './features/better-dependencies.ts'
 import * as betterVersions from './features/better-versions.ts'
+import * as fixHighlightStyles from './features/fix-highlight-styles.ts'
 import * as fixIssuePrCount from './features/fix-issue-pr-count.ts'
 import * as fixStyles from './features/fix-styles.ts'
 import * as helpfulLinks from './features/helpful-links.ts'
@@ -48,6 +49,7 @@ export interface FeatureModule {
 export const allFeatures: Record<string, FeatureModule> = {
   'better-dependencies': betterDependencies,
   'better-versions': betterVersions,
+  'fix-highlight-styles': fixHighlightStyles,
   'fix-issue-pr-count': fixIssuePrCount,
   'fix-styles': fixStyles,
   'helpful-links': helpfulLinks,
