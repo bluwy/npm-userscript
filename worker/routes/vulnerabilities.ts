@@ -104,7 +104,8 @@ export const handler: RouteHandler = async (request, env, ctx) => {
   const response = Response.json(filtered, {
     headers: {
       'Cache-Control': `public, max-age=${CACHE_TTL}`,
-      'Access-Control-Allow-Origin': 'https://www.npmjs.com',
+      // For now this API is unlikely to change, so allow everyone to use
+      'Access-Control-Allow-Origin': '*',
     },
   })
 
