@@ -14,11 +14,12 @@ const getBannerKey = (banner: Element) => {
 }
 
 // We can use a shared inited variable since the banner is site-wide
+let preInited = false
 let inited = false
 
 export function runPre() {
-  if (inited) return
-  inited = true
+  if (preInited) return
+  preInited = true
 
   // Pre-emptively hide the banner if we've previously closed any of it. We can't check the banner
   // element here as it might not exist yet.
@@ -36,6 +37,7 @@ export function runPre() {
 
 export function run() {
   if (inited) return
+  inited = true
 
   const banner = document.querySelector<HTMLElement>('section[aria-label="Site notifications"]')
   if (!banner) return
