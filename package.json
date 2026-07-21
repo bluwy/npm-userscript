@@ -23,22 +23,22 @@
     "format": "prettier --write \"**/*.ts\"",
     "update-readme": "node ./scripts/update-readme.ts"
   },
-  "packageManager": "pnpm@10.33.0",
+  "packageManager": "pnpm@11.15.1",
   "dependencies": {
-    "@floating-ui/dom": "^1.7.6",
-    "ae-cvss-calculator": "^1.0.12",
+    "@floating-ui/dom": "^1.8.0",
+    "ae-cvss-calculator": "^1.0.13",
     "get-npm-tarball-url": "^2.1.0",
-    "semver": "^7.7.4",
+    "semver": "^7.8.5",
     "uhtml": "^5.0.9"
   },
   "devDependencies": {
     "@bluwy/usb": "^0.2.0",
     "@types/greasemonkey": "^4.0.7",
-    "@types/node": "^25.5.2",
+    "@types/node": "^26.1.1",
     "@types/semver": "^7.7.1",
     "module-replacements": "^2.11.0",
-    "prettier": "^3.8.1",
-    "typescript": "^6.0.2",
-    "wrangler": "^4.81.0"
+    "prettier": "^3.9.5",
+    "typescript": "^7.0.2",
+    "wrangler": "^4.112.0"
   }
 }
