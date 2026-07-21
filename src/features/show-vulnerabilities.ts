@@ -59,7 +59,7 @@ export function runPre() {
       top: 0;
       left: 0;
       background: var(--background-color);
-      color: black;
+      color: var(--color-fg-default);
       font-size: 90%;
       padding: 4px 8px;
       border-radius: 4px;
