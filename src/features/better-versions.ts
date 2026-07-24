@@ -2,8 +2,8 @@ import { getNpmContext } from '../utils-npm-context.ts'
 import { addStyle, isValidPackagePage } from '../utils.ts'
 
 export const description = `\
-Improved package versions tab with compact table view, cumulated versions table, show tags next to
-versions, and fix provenance icon alignment.
+Improved package versions tab with compact table view, collapsed large tags table, cumulated
+versions table, show tags next to versions, and fix provenance icon alignment.
 `
 
 interface VersionInfo {
@@ -71,6 +71,27 @@ export function runPre() {
     }
   `)
 
+  // Styles for collapsed large tags table
+  addStyle(`
+    table[aria-labelledby="current-tags"] .npm-userscript-tag-show-more-td {
+      padding: 0;
+      column-width: auto
+    }
+    table[aria-labelledby="current-tags"] .npm-userscript-tag-show-more-button {
+      display: block;
+      width: 100%;
+      cursor: pointer;
+      background-color: transparent;
+      border: none;
+      padding: 8px;
+      opacity: 0.8;
+    }
+    table[aria-labelledby="current-tags"] .npm-userscript-tag-show-more-button:hover,
+    table[aria-labelledby="current-tags"] .npm-userscript-tag-show-more-button:focus {
+      opacity: 1;
+    }
+  `)
+
   // Styles for cumulated versions table
   addStyle(`
     table[aria-labelledby="cumulated-versions"] .npm-userscript-cumulated-versions-minor {
@@ -99,6 +120,7 @@ export function run() {
   if (new URLSearchParams(location.search).get('activeTab') !== 'versions') return
 
   addVersionTag()
+  collapseLargeTagsTable()
   addCumulatedVersionsTable()
 }
 
@@ -126,6 +148,55 @@ function addVersionTag() {
       'afterend',
       `<span class="npm-userscript-tag ml2">(${tags.join(', ')})</span>`,
     )
+  }
+}
+
+const largeTagsNumber = 10
+const insignificantDownloadsThreshold = 10
+
+function collapseLargeTagsTable() {
+  const tagsTable = document.querySelector('table[aria-labelledby="current-tags"]')
+  if (!tagsTable) return
+
+  const tbody = tagsTable.querySelector('tbody')
+  if (!tbody) return
+
+  const rows = tbody.querySelectorAll('tr')
+  if (rows.length <= largeTagsNumber) return
+
+  // Search bottom up until one row passes the threshold
+  const insignificantRows: HTMLTableRowElement[] = []
+  for (let i = rows.length - 1; i >= 0; i--) {
+    const downloadsCell = rows[i].querySelector('td:nth-child(2)')
+    if (!downloadsCell) continue
+    const downloadsText = downloadsCell.textContent?.replace(/[^0-9]/g, '') || '0'
+    if (parseInt(downloadsText) <= insignificantDownloadsThreshold) {
+      insignificantRows.push(rows[i])
+    } else {
+      break
+    }
+  }
+
+  // Add a "Show more" button at the last row
+  const lastRow = document.createElement('tr')
+  lastRow.innerHTML = `
+    <td colspan="3" class="npm-userscript-tag-show-more-td">
+      <button class="npm-userscript-tag-show-more-button">
+        Show ${insignificantRows.length} more
+      </button>
+    </td>
+  `
+  lastRow.querySelector('button')!.addEventListener('click', () => {
+    for (const row of insignificantRows) {
+      row.style.display = ''
+    }
+    lastRow.style.display = 'none'
+  })
+  tbody.appendChild(lastRow)
+
+  // Hide insignificant rows
+  for (const row of insignificantRows) {
+    row.style.display = 'none'
   }
 }
 
